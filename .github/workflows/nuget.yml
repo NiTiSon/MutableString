@@ -1,0 +1,25 @@
+name: NuGet publish
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: | 
+          9.0.x
+          5.0.x
+    - name: Generate package
+      run: dotnet pack
+    - name: Publish packages
+      env:
+        NUGET_TOKEN: ${{ secrets.NUGET_TOKEN }}
+      run: |
+        dotnet nuget push outPackages/MutableString.0.1.0.nupkg --api-key %NUGET_TOKEN% --source https://api.nuget.org/v3/index.json
+        dotnet nuget push outPackages/MutableString.0.1.0.snupkg --api-key %NUGET_TOKEN% --source https://api.nuget.org/v3/index.json
