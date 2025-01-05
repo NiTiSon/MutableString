@@ -16,7 +16,7 @@
 		<Nullable>enable</Nullable>
 		<RootNamespace>NiTiS</RootNamespace>
 
-		<VersionPrefix>0.1</VersionPrefix>
+		<VersionPrefix>0.2</VersionPrefix>
 
 		<NoWarn>$(NoWarn);IDE0290;IDE0305</NoWarn>
 

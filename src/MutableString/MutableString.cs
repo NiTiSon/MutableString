@@ -81,6 +81,21 @@ public partial class MutableString : IEnumerable<char>, IEnumerable, IEquatable<
 	// Contains
 	// StartsWith/EndsWith
 
+	/// <summary>
+	/// Returns a value indicating whether a specified character occurs within this string.
+	/// </summary>
+	/// <param name="value">The char to seek.</param>
+	/// <returns><see langword="true"/> if character contains within string; otherwise, <see langword="false"/>.</returns>
+	public bool Contains(char value)
+	{
+		for (int i = 0; i < length; i++)
+		{
+			if (buffer[i] == value) return true;
+		}
+
+		return false;
+	}
+
 	#region Standard methods
 	public override bool Equals(object? obj)
 	{
