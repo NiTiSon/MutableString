@@ -5,7 +5,7 @@
 		<PackageTags>$(PackageTags);string;mutable;fast</PackageTags>
 		<Description>Mutable string implementation</Description>
 		<PublishRepositoryUrl>true</PublishRepositoryUrl>
-		<TargetFrameworks>net9.0;net5.0</TargetFrameworks>
+		<TargetFrameworks>net9.0;net6.0</TargetFrameworks>
 
 		<PackageOutputPath>$(MSBuildThisFileDirectory)/../outPackages</PackageOutputPath>
 
