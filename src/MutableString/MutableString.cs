@@ -3,11 +3,13 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 
 namespace NiTiS;
 
 [DebuggerDisplay("{ToString()}")]
-public partial class MutableString : IEnumerable<char>, IEnumerable, IEquatable<MutableString>
+public partial class MutableString : IEnumerable<char>, IEnumerable, IEquatable<MutableString>, IEquatable<string>
 {
 	private const int DefaultCapacity = 32;
 
@@ -70,10 +72,20 @@ public partial class MutableString : IEnumerable<char>, IEnumerable, IEquatable<
 		return new MutableString(this.buffer, 0, this.length);
 	}
 
+	// Replace
+	// Insert
+	// Reverse
+	// Shift/Rotate?
+	// Process(delegate)
+	// IndexOf/IndexOfAny
+	// Contains
+	// StartsWith/EndsWith
+
 	#region Standard methods
 	public override bool Equals(object? obj)
 	{
-		return obj is MutableString other && this.Equals(other);
+		return obj is MutableString other && this.Equals(other)
+			|| obj is string str && this.Equals(str);
 	}
 
 	public bool Equals(MutableString? other)
@@ -93,6 +105,26 @@ public partial class MutableString : IEnumerable<char>, IEnumerable, IEquatable<
 		for (int i = 0; i < this.length; i++)
 		{
 			if (first[i] != second[i]) return false;
+		}
+
+		return true;
+	}
+
+	public bool Equals(string? other)
+	{
+#if NET8_0_OR_GREATER
+		ArgumentNullException.ThrowIfNull(other);
+#else
+		Guard.IsNotNull(other);
+#endif
+		if (other!.Length != this.length) return false;
+
+		ref char otherReference = ref MemoryMarshal.GetReference(other.AsSpan());
+		ref char thisReference = ref MemoryMarshal.GetArrayDataReference(this.buffer); // Must be ref readonly, but Unsafe.Add allows only refs
+
+		for (int i = 0; i < this.length; i++)
+		{
+			if (Unsafe.Add(ref otherReference, i) != Unsafe.Add(ref thisReference, i)) return false;
 		}
 
 		return true;
