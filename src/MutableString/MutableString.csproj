@@ -3,7 +3,9 @@
 	<Import Project="../../build/common.props" />
 
 	<PropertyGroup>
+		<IsPackable>true</IsPackable>
 		<DebugType>full</DebugType>
+		<SuppressTfmSupportBuildWarnings>true</SuppressTfmSupportBuildWarnings>
 	</PropertyGroup>
 
 	<ItemGroup>
