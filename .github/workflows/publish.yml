@@ -20,7 +20,7 @@ jobs:
     - name: Configure
       run: |
         dotnet nuget add source --username NiTiSon --password ${{ secrets.GITHUB_TOKEN }} --store-password-in-clear-text --name github "https://nuget.pkg.github.com/NiTiSon/index.json"
-        dotnet nuget add source --username NickName73 --password ${{ secrets.NUGET_TOKEN }} --store-password-in-crear-text  --name nuget "https://api.nuget.org/v3/index.json"
+        dotnet nuget add source --username NickName73 --password ${{ secrets.NUGET_TOKEN }} --store-password-in-clear-text  --name nuget "https://api.nuget.org/v3/index.json"
     - name: Github publish
       run: |
         dotnet nuget push outPackages/MutableString.0.1.0.nupkg --source github
