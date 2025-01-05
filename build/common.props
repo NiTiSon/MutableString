@@ -19,9 +19,7 @@
 		<VersionPrefix>0.1</VersionPrefix>
 
 		<NoWarn>$(NoWarn);IDE0290;IDE0305</NoWarn>
-	</PropertyGroup>
 
-	<PropertyGroup Condition="'$(IsPackable)' == 'true'">
 		<DebugType>portable</DebugType>
 		<EmbedAllSources>true</EmbedAllSources>
 		<EmbedUntrackedSources>true</EmbedUntrackedSources>
