@@ -8,30 +8,77 @@ using System.Runtime.InteropServices;
 
 namespace NiTiS;
 
+/// <summary>
+/// Represents a mutable string of characters.
+/// </summary>
 [DebuggerDisplay("{ToString()}")]
-public partial class MutableString : IEnumerable<char>, IEnumerable, IEquatable<MutableString>, IEquatable<string>
+public partial class MutableString : IEnumerable<char>, IEnumerable, IEquatable<MutableString?>, IEquatable<string?>
 {
 	private const int DefaultCapacity = 32;
 
 	private char[] buffer;
 	private int length;
 
+	/// <summary>
+	/// Internal buffer capacity of current <see cref="MutableString"/>.
+	/// </summary>
 	public int Capacity => buffer.Length;
 
-	public int Length => length;
+	/// <summary>
+	/// Length of current <see cref="MutableString"/>.
+	/// </summary>
+	public int Length
+	{
+		get => length;
+		//set
+		//{
 
+		//}
+	}
+
+	/// <summary>
+	/// Initialize empty <see cref="MutableString"/> instance.
+	/// </summary>
 	public MutableString()
 	{
 		buffer = new char[DefaultCapacity];
 		length = 0;
 	}
 
+	/// <summary>
+	/// Initialize empty <see cref="MutableString"/> instance with specified <paramref name="capacity"/>.
+	/// </summary>
+	/// <exception cref="ArgumentOutOfRangeException"><paramref name="capacity"/> is negative or zero.</exception>
+	public MutableString(int capacity)
+	{
+#if NET8_0_OR_GREATER
+		ArgumentOutOfRangeException.ThrowIfNegativeOrZero(capacity);
+#else
+		if (capacity <= 0)
+		{
+			ThrowHelper.ThrowArgumentOutOfRangeException(nameof(capacity));
+		}
+#endif
+
+		buffer = new char[capacity];
+		length = 0;
+	}
+
+	/// <summary>
+	/// Initialize new <see cref="MutableString"/> instance with specified value.
+	/// </summary>
+	/// <param name="value">Initial value of new <see cref="MutableString"/>.</param>
 	public MutableString(ReadOnlySpan<char> value)
 	{
 		buffer = new char[length = value.Length];
 		value.CopyTo(buffer);
 	}
 
+	/// <summary>
+	/// Initialize new <see cref="MutableString"/> instance with specified value from array.
+	/// </summary>
+	/// <param name="value">Initial value of new <see cref="MutableString"/>.</param>
+	/// <exception cref="ArgumentNullException"><paramref name="value"/> is null.</exception>
 	public MutableString(char[] value)
 	{
 #if NET8_0_OR_GREATER
@@ -45,6 +92,16 @@ public partial class MutableString : IEnumerable<char>, IEnumerable, IEquatable<
 		value.CopyTo(buffer, length);
 	}
 
+	/// <summary>
+	/// Initialize new <see cref="MutableString"/> instance with specified value from array
+	/// with offset and specified length.
+	/// </summary>
+	/// <param name="value">Initial value of new <see cref="MutableString"/>.</param>
+	/// <param name="startIndex">Offset of <paramref name="value"/> to copy.</param>
+	/// <param name="length">Length of content to copy.</param>
+	/// <exception cref="ArgumentNullException"><paramref name="value"/> is null.</exception>
+	/// <exception cref="ArgumentOutOfRangeException"><paramref name="startIndex"/> is out of <paramref name="value"/> bounds.</exception>
+	/// <exception cref="ArgumentOutOfRangeException"><paramref name="length"/> is out of <paramref name="value"/> bounds.</exception>
 	public MutableString(char[] value, int startIndex, int length)
 	{
 #if NET8_0_OR_GREATER
@@ -67,18 +124,35 @@ public partial class MutableString : IEnumerable<char>, IEnumerable, IEquatable<
 		value.CopyTo(this.buffer, startIndex);
 	}
 
+	//[IndexerName("Chars")]
+	//public char this[int index]
+	//{
+	//	get
+	//	{
+	//		return buffer[index];
+	//	}
+	//	set
+	//	{
+	//		buffer[index] = value;
+	//	}
+	//}
+
+	/// <summary>
+	/// Create new <see cref="MutableString"/> instance with same content.
+	/// </summary>
+	/// <returns>Copy of current instance.</returns>
 	public MutableString Duplicate()
 	{
 		return new MutableString(this.buffer, 0, this.length);
 	}
 
+	// TODO:
 	// Replace
 	// Insert
 	// Reverse
 	// Shift/Rotate?
 	// Process(delegate)
 	// IndexOf/IndexOfAny
-	// Contains
 	// StartsWith/EndsWith
 
 	/// <summary>
@@ -97,12 +171,20 @@ public partial class MutableString : IEnumerable<char>, IEnumerable, IEquatable<
 	}
 
 	#region Standard methods
+
+	/// <inheritdoc/>
 	public override bool Equals(object? obj)
 	{
 		return obj is MutableString other && this.Equals(other)
 			|| obj is string str && this.Equals(str);
 	}
 
+	/// <summary>
+	/// Returns a value indicating whether the characters in this instance
+	/// are equal to the characters in a specified string.
+	/// </summary>
+	/// <param name="other">The string to compare with current instance.</param>
+	/// <returns><see langword="true"/> if <paramref name="other"/> content are same; otherwise, <see langword="false"/>.</returns>
 	public bool Equals(MutableString? other)
 	{
 #if NET8_0_OR_GREATER
@@ -125,6 +207,12 @@ public partial class MutableString : IEnumerable<char>, IEnumerable, IEquatable<
 		return true;
 	}
 
+	/// <summary>
+	/// Returns a value indicating whether the characters in this instance
+	/// are equal to the characters in a specified string.
+	/// </summary>
+	/// <param name="other">The string to compare with current instance.</param>
+	/// <returns><see langword="true"/> if <paramref name="other"/> content are same; otherwise, <see langword="false"/>.</returns>
 	public bool Equals(string? other)
 	{
 #if NET8_0_OR_GREATER
@@ -144,22 +232,29 @@ public partial class MutableString : IEnumerable<char>, IEnumerable, IEquatable<
 
 		return true;
 	}
-
+	
+	/// <inheritdoc/>
 	public IEnumerator<char> GetEnumerator()
 	{
 		return new Enumerator(this);
 	}
 
+	/// <inheritdoc/>
 	IEnumerator IEnumerable.GetEnumerator()
 	{
 		return this.GetEnumerator();
 	}
 
+	/// <summary>
+	/// Copy content of <see cref="MutableString"/> to new immutable <see cref="string"/>.
+	/// </summary>
+	/// <returns>A new <see cref="string"/> instance with same content.</returns>
 	public override string ToString()
 	{
 		return new string(buffer, 0, length);
 	}
 
+	/// <inheritdoc/>
 	public override int GetHashCode()
 	{
 		return this.ToString().GetHashCode();
