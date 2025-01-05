@@ -1,0 +1,42 @@
+<Project InitialTargets="MutableString_SetIcon">
+	<PropertyGroup>
+		<PackageLicenseExpression>MIT</PackageLicenseExpression>
+		<Authors>NiTiSon and contributors</Authors>
+		<PackageTags>$(PackageTags);string;mutable;fast</PackageTags>
+		<Description>Mutable string implementation</Description>
+		<PublishRepositoryUrl>true</PublishRepositoryUrl>
+		<TargetFrameworks>net9.0;net5.0</TargetFrameworks>
+
+		<PackageOutputPath>$(MSBuildThisFileDirectory)/../outPackages</PackageOutputPath>
+
+		<LangVersion>latest</LangVersion>
+		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+		<ImplicitUsings>disable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+		<RootNamespace>NiTiS</RootNamespace>
+
+		<VersionPrefix>0.1</VersionPrefix>
+
+
+		<EnableTrimAnalyzer>true</EnableTrimAnalyzer>
+		<EnableAotAnalyzer>true</EnableAotAnalyzer>
+		<IsTrimmable>true</IsTrimmable>
+		<TrimMode>full</TrimMode>
+		<EnableTrimAnalyzer>true</EnableTrimAnalyzer>
+		<NoWarn>$(NoWarn);IDE0290;IDE0305</NoWarn>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Microsoft.SourceLink.GitHub" Version="8.0.0" PrivateAssets="All"/>
+	</ItemGroup>
+
+	<!-- Setup the icon for libraries -->
+	<Target Name="MutableString_SetIcon">
+		<ItemGroup>
+			<None Include="$(MSBuildThisFileDirectory)../public/logo.png" Pack="true" PackagePath="/" />
+		</ItemGroup>
+		<PropertyGroup>
+			<PackageIcon>logo.png</PackageIcon>
+		</PropertyGroup>
+	</Target>
+</Project>
