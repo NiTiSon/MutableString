@@ -12,7 +12,7 @@ namespace NiTiS;
 /// Represents a mutable string of characters.
 /// </summary>
 [DebuggerDisplay("{ToString()}")]
-public partial class MutableString : IEnumerable<char>, IEnumerable, IEquatable<MutableString?>, IEquatable<string?>
+public sealed partial class MutableString : IEnumerable<char>, IEnumerable, IEquatable<MutableString?>, IEquatable<string?>
 {
 	private const int DefaultCapacity = 32;
 
@@ -153,13 +153,34 @@ public partial class MutableString : IEnumerable<char>, IEnumerable, IEquatable<
 	// StartsWith/EndsWith
 
 	/// <summary>
+	/// Appends the string representation of a specified <see cref="char"/> object to this <see cref="MutableString"/> instance.
+	/// </summary>
+	/// <param name="value"></param>
+	/// <returns>A reference to this instance after the append operation is completed.</returns>
+	public MutableString Append(char value)
+	{
+		return Insert(length, value);
+	}
+
+	/// <summary>
+	/// Appends the string representation of a specified read-only character span to this <see cref="MutableString"/> instance.
+	/// </summary>
+	/// <param name="value"></param>
+	/// <returns>A reference to this instance after the append operation is completed.</returns>
+	public MutableString Append(ReadOnlySpan<char> value)
+	{
+		return Insert(length, value);
+	}
+
+	/// <summary>
 	/// Insert character in <see cref="MutableString"/> at <paramref name="index"/>.
 	/// If required, the string capacity may be increased.
 	/// </summary>
 	/// <param name="index">Index to insert character.</param>
 	/// <param name="value">Character to insert.</param>
+	/// <returns>A reference to this instance after the append operation is completed.</returns>
 	/// <exception cref="ArgumentOutOfRangeException"><paramref name="index"/> are out of string bounds.</exception>
-	public void Insert(int index, char value)
+	public MutableString Insert(int index, char value)
 	{
 #if NET8_0_OR_GREATER
 		ArgumentOutOfRangeException.ThrowIfGreaterThan((uint)index, (uint)length);
@@ -178,6 +199,8 @@ public partial class MutableString : IEnumerable<char>, IEnumerable, IEquatable<
 
 		buffer[index] = value;
 		length++;
+
+		return this;
 	}
 
 	/// <summary>
@@ -186,8 +209,9 @@ public partial class MutableString : IEnumerable<char>, IEnumerable, IEquatable<
 	/// </summary>
 	/// <param name="index">Index to insert string.</param>
 	/// <param name="value">String to insert.</param>
+	/// <returns>A reference to this instance after the append operation is completed.</returns>
 	/// <exception cref="ArgumentOutOfRangeException"><paramref name="index"/> are out of string bounds.</exception>
-	public void Insert(int index, ReadOnlySpan<char> value)
+	public MutableString Insert(int index, ReadOnlySpan<char> value)
 	{
 #if NET8_0_OR_GREATER
 		ArgumentOutOfRangeException.ThrowIfGreaterThan((uint)index, (uint)length);
@@ -197,7 +221,7 @@ public partial class MutableString : IEnumerable<char>, IEnumerable, IEquatable<
 
 		int count = value.Length;
 
-		if (count == 0) return;
+		if (count == 0) return this;
 
 		if (Capacity - length < count)
 		{
@@ -211,6 +235,8 @@ public partial class MutableString : IEnumerable<char>, IEnumerable, IEquatable<
 		value.CopyTo(buffer.AsSpan()[index..]);
 
 		length += count;
+
+		return this;
 	}
 
 	/// <summary>
@@ -232,7 +258,7 @@ public partial class MutableString : IEnumerable<char>, IEnumerable, IEquatable<
 	/// <summary>
 	/// Reverse character order of this string.
 	/// </summary>
-	/// <returns>This object with reversed content.</returns>
+	/// <returns>A reference to this instance after the append operation is completed.</returns>
 	public MutableString Reverse()
 	{
 		Array.Reverse(buffer, 0, length);

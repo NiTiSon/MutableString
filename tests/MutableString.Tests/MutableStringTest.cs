@@ -15,13 +15,13 @@ internal class MutableStringTest
 		s.Insert(0, 'c');
 		s.Insert(0, 'd');
 
-		Assert.AreEqual(s.Length, 4);
-		Assert.AreEqual(s.ToString(), "dcba");
+		Assert.AreEqual(4, s.Length);
+		Assert.AreEqual("dcba", s.ToString());
 
 		s.Insert(2, '\0');
 
-		Assert.AreEqual(s.Length, 5);
-		Assert.AreEqual(s.ToString(), "dc\0ba");
+		Assert.AreEqual(5, s.Length);
+		Assert.AreEqual("dc\0ba", s.ToString());
 
 		Assert.Throws<ArgumentOutOfRangeException>(() =>
 		{
@@ -46,16 +46,16 @@ internal class MutableStringTest
 
 		s.Insert(0, "abobus");
 
-		Assert.AreEqual(s.Length, 6);
+		Assert.AreEqual(6, s.Length);
 
 		s.Insert(1, "\0");
 
-		Assert.AreEqual(s.Length, 7);
-		Assert.AreEqual(s.ToString(), "a\0bobus");
+		Assert.AreEqual(7, s.Length);
+		Assert.AreEqual("a\0bobus", s.ToString());
 
 		s.Insert(1, "Vore");
 
-		Assert.AreEqual(s.ToString(), "aVore\0bobus");
+		Assert.AreEqual("aVore\0bobus", s.ToString());
 
 		Assert.Throws<ArgumentOutOfRangeException>(() =>
 		{
@@ -71,6 +71,26 @@ internal class MutableStringTest
 		{
 			s.Insert(s.Length + 1, "A");
 		});
+	}
+
+	[Test]
+	public void Append_Char()
+	{
+		MutableString s = new("Xyዱ");
+
+		s.Append('x');
+
+		Assert.AreEqual("Xyዱx", s.ToString());
+	}
+
+	[Test]
+	public void Append_ReadOnlySpan()
+	{
+		MutableString s = new("qwăe");
+
+		s.Append("oooK");
+
+		Assert.AreEqual("qwăeoooK", s.ToString());
 	}
 
 	[Test]
