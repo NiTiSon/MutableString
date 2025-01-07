@@ -1,0 +1,19 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<Import Project="../../build/common.props" />
+
+	<PropertyGroup>
+		<OutputType>Exe</OutputType>
+		<IsPackable>false</IsPackable>
+		<NoWarn>$(NoWarn);CS1591</NoWarn>
+		<IsTrimmable>false</IsTrimmable>
+		<TrimMode>partial</TrimMode>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<PackageReference Include="BenchmarkDotNet" Version="0.14.0" />
+		
+		<ProjectReference Include="..\..\src\MutableString\MutableString.csproj" />
+	</ItemGroup>
+
+</Project>
