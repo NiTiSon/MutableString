@@ -148,12 +148,70 @@ public partial class MutableString : IEnumerable<char>, IEnumerable, IEquatable<
 
 	// TODO:
 	// Replace
-	// Insert
-	// Reverse
 	// Shift/Rotate?
-	// Process(delegate)
 	// IndexOf/IndexOfAny
 	// StartsWith/EndsWith
+
+	/// <summary>
+	/// Insert character in <see cref="MutableString"/> at <paramref name="index"/>.
+	/// If required, the string capacity may be increased.
+	/// </summary>
+	/// <param name="index">Index to insert character.</param>
+	/// <param name="value">Character to insert.</param>
+	/// <exception cref="ArgumentOutOfRangeException"><paramref name="index"/> are out of string bounds.</exception>
+	public void Insert(int index, char value)
+	{
+#if NET8_0_OR_GREATER
+		ArgumentOutOfRangeException.ThrowIfGreaterThan((uint)index, (uint)length);
+#else
+		Guard.IsLessThanOrEqualTo((uint)index, (uint)length);
+#endif
+
+		if (length == Capacity)
+		{
+			GrowForInsertion(index, 1);
+		}
+		else if (index < length)
+		{
+			Array.Copy(buffer, index, buffer, index + 1, length - index);
+		}
+
+		buffer[index] = value;
+		length++;
+	}
+
+	/// <summary>
+	/// Insert string in <see cref="MutableString"/> at <paramref name="index"/>.
+	/// If required, the string capacity may be increased.
+	/// </summary>
+	/// <param name="index">Index to insert string.</param>
+	/// <param name="value">String to insert.</param>
+	/// <exception cref="ArgumentOutOfRangeException"><paramref name="index"/> are out of string bounds.</exception>
+	public void Insert(int index, ReadOnlySpan<char> value)
+	{
+#if NET8_0_OR_GREATER
+		ArgumentOutOfRangeException.ThrowIfGreaterThan((uint)index, (uint)length);
+#else
+		Guard.IsLessThanOrEqualTo((uint)index, (uint)length);
+#endif
+
+		int count = value.Length;
+
+		if (count == 0) return;
+
+		if (Capacity - length < count)
+		{
+			GrowForInsertion(index, count);
+		}
+		else if (index < length)
+		{
+			Array.Copy(buffer, index, buffer, index + count, length - index);
+		}
+
+		value.CopyTo(buffer.AsSpan()[index..]);
+
+		length += count;
+	}
 
 	/// <summary>
 	/// Returns a value indicating whether a specified character occurs within this string.
@@ -162,12 +220,55 @@ public partial class MutableString : IEnumerable<char>, IEnumerable, IEquatable<
 	/// <returns><see langword="true"/> if character contains within string; otherwise, <see langword="false"/>.</returns>
 	public bool Contains(char value)
 	{
+		ref char buffer = ref MemoryMarshal.GetArrayDataReference(this.buffer);
 		for (int i = 0; i < length; i++)
 		{
-			if (buffer[i] == value) return true;
+			if (Unsafe.Add(ref buffer, i) == value) return true;
 		}
 
 		return false;
+	}
+
+	/// <summary>
+	/// Reverse character order of this string.
+	/// </summary>
+	/// <returns>This object with reversed content.</returns>
+	public MutableString Reverse()
+	{
+		Array.Reverse(buffer, 0, length);
+
+		return this;
+	}
+
+	[MethodImpl(MethodImplOptions.AggressiveInlining)]
+	private int GetNewCapacity(int requiredCapacity)
+	{
+		int newCapacity = buffer.Length == 0 ? DefaultCapacity : 2 * buffer.Length;
+
+		if ((uint)newCapacity > Array.MaxLength) newCapacity = Array.MaxLength;
+
+		if (newCapacity < requiredCapacity) newCapacity = requiredCapacity;
+	
+		return newCapacity;
+	}
+
+	private void GrowForInsertion(int indexToInsert, int insertionWidth)
+	{
+		int requiredCapacity = checked(length + insertionWidth);
+		int newCapacity = GetNewCapacity(requiredCapacity);
+
+		char[] newBuffer = new char[newCapacity];
+		if (indexToInsert != 0)
+		{
+			Array.Copy(buffer, newBuffer, length: indexToInsert);
+		}
+
+		if (length != indexToInsert)
+		{
+			Array.Copy(buffer, indexToInsert, newBuffer, indexToInsert + insertionWidth, length - indexToInsert);
+		}
+
+		buffer = newBuffer;
 	}
 
 	#region Standard methods
