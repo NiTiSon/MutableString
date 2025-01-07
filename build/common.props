@@ -62,7 +62,7 @@
 		</PropertyGroup>
 
 		<ItemGroup>
-			<None Include ="./NUGET_README.md" Pack="true" PackagePath="/" />
+			<None Include ="$(MSBuildThisFileDirectory)../public/NUGET_README.md" Pack="true" PackagePath="/" />
 		</ItemGroup>
 	</Target>
 
