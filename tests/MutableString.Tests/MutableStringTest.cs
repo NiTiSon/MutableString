@@ -102,4 +102,45 @@ internal class MutableStringTest
 		Assert.IsTrue(s.Contains('i'));
 		Assert.IsFalse(s.Contains('8'));
 	}
+
+	public void IndexOf_Char()
+	{
+		MutableString s = new("Amongus is sus?7");
+
+		Assert.AreEqual(0, s.IndexOf('A'));
+		Assert.AreEqual(s.Length - 1, s.IndexOf('7'));
+		Assert.AreEqual(-1, s.IndexOf('Я'));
+	}
+
+	[Test]
+	public void IndexOf_Char2()
+	{
+		MutableString s = new("Amongus is sus?7");
+
+		Assert.AreEqual(0, s.IndexOf('A', 0, 1));
+		Assert.AreEqual(-1, s.IndexOf('7', 0, 1));
+		Assert.AreEqual(-1, s.IndexOf('Я', 0, 1));
+
+		Assert.AreEqual(6, s.IndexOf('s', 0));
+		Assert.AreEqual(9, s.IndexOf('s', 7));
+		Assert.AreEqual(11, s.IndexOf('s', 10, 2));
+		Assert.AreEqual(13, s.IndexOf('s', 12, 2));
+
+		Assert.Throws<ArgumentOutOfRangeException>(() =>
+		{
+			s.IndexOf('x', -1);
+		});
+
+		Assert.Throws<ArgumentOutOfRangeException>(() =>
+		{
+			s.IndexOf('x', -1, 0);
+		});
+
+		Assert.Throws<ArgumentOutOfRangeException>(() =>
+		{
+			s.IndexOf('x', 0, -1);
+		});
+
+		Assert.AreEqual(-1, s.IndexOf('Я', 0, 0));
+	}
 }

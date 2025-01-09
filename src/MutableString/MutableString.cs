@@ -3,6 +3,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
@@ -247,6 +248,8 @@ public sealed partial class MutableString : IEnumerable<char>, IEnumerable, IEqu
 	public bool Contains(char value)
 	{
 		ref char buffer = ref MemoryMarshal.GetArrayDataReference(this.buffer);
+		int length = this.length;
+		
 		for (int i = 0; i < length; i++)
 		{
 			if (Unsafe.Add(ref buffer, i) == value) return true;
@@ -264,6 +267,83 @@ public sealed partial class MutableString : IEnumerable<char>, IEnumerable, IEqu
 		Array.Reverse(buffer, 0, length);
 
 		return this;
+	}
+
+	/// <summary>
+	/// Searches for the first occurrence of a specified character within the current string.
+	/// </summary>
+	/// <param name="value">The character to locate within the string.</param>
+	/// <returns>
+	/// The zero-based index of the first occurrence of the specified character if found; otherwise, -1.
+	/// </returns>
+	public int IndexOf(char value)
+	{
+		// Array.IndexOf is faster ~1.5 times than usual for loop
+		return Array.IndexOf(this.buffer, value, 0);
+	}
+
+	/// <summary>
+	/// Searches for the first occurrence of a specified character within the current string from specified <paramref name="index"/>.
+	/// </summary>
+	/// <param name="value">The character to locate within the string.</param>
+	/// <param name="index">The zero-based starting index of the search.</param>
+	/// <returns>
+	/// The zero-based index of the first occurrence of the specified character if found; otherwise, -1.
+	/// </returns>
+	/// <exception cref="ArgumentOutOfRangeException">
+	/// <paramref name="index"/> is outside the range of valid indexes for the string.
+	/// </exception>
+	public int IndexOf(char value, int index)
+	{
+		return Array.IndexOf(this.buffer, value, index, this.length - index); 
+	}
+
+	/// <summary>
+	/// Searches for the first occurrence of a specified character within the specified section of current string.
+	/// </summary>
+	/// <param name="value">The character to locate within the string.</param>
+	/// <param name="index">The zero-based starting index of the search.</param>
+	/// <param name="count">The number of elements in the string to search.</param>
+	/// <returns>
+	/// The zero-based index of the first occurrence of the specified character if found; otherwise, -1.
+	/// </returns>
+	/// <exception cref="ArgumentOutOfRangeException">
+	/// <paramref name="index"/> is outside the range of valid indexes for the string.
+	/// -or-
+	/// <paramref name="count"/> is less than 0.
+	/// -or-
+	/// <paramref name="index"/> and <paramref name="count"/> do not specify a valid section in the string.
+	/// </exception>
+	public int IndexOf(char value, int index, int count)
+	{
+		return Array.IndexOf(this.buffer, value, index, count);
+	}
+
+	/// <summary>
+	/// Searches for the first occurrence of a specified substring within the current string.
+	/// </summary>
+	/// <param name="value">The substring to locate within the string.</param>
+	/// <returns>
+	/// The zero-based index of the first occurrence of the specified substring if found; otherwise, -1.
+	/// If <paramref name="value"/> is an empty span, 0 is returned.
+	/// </returns>
+	public int IndexOf(ReadOnlySpan<char> value)
+	{
+		if (value.Length == 0) return 0; // Empty string can be found anywhere, even in other empty string
+
+		ref char buffer = ref MemoryMarshal.GetArrayDataReference(this.buffer);
+		ref char other = ref MemoryMarshal.GetReference(value);
+		int length = this.length;
+
+		for (int i = 0; i <= length - value.Length; i++)
+		{
+			if (MemoryMarshal.CreateSpan(ref buffer, length).Slice(i, value.Length).SequenceEqual(value))
+			{
+				return i;
+			}
+		}
+
+		return -1;
 	}
 
 	[MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -325,8 +405,9 @@ public sealed partial class MutableString : IEnumerable<char>, IEnumerable, IEqu
 
 		char[] first = other.buffer;
 		char[] second = other.buffer;
+		int length = this.length;
 
-		for (int i = 0; i < this.length; i++)
+		for (int i = 0; i < length; i++)
 		{
 			if (first[i] != second[i]) return false;
 		}
@@ -351,8 +432,9 @@ public sealed partial class MutableString : IEnumerable<char>, IEnumerable, IEqu
 
 		ref char otherReference = ref MemoryMarshal.GetReference(other.AsSpan());
 		ref char thisReference = ref MemoryMarshal.GetArrayDataReference(this.buffer); // Must be ref readonly, but Unsafe.Add allows only refs
+		int length = this.length;
 
-		for (int i = 0; i < this.length; i++)
+		for (int i = 0; i < length; i++)
 		{
 			if (Unsafe.Add(ref otherReference, i) != Unsafe.Add(ref thisReference, i)) return false;
 		}
