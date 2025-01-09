@@ -249,7 +249,7 @@ public sealed partial class MutableString : IEnumerable<char>, IEnumerable, IEqu
 	{
 		ref char buffer = ref MemoryMarshal.GetArrayDataReference(this.buffer);
 		int length = this.length;
-		
+
 		for (int i = 0; i < length; i++)
 		{
 			if (Unsafe.Add(ref buffer, i) == value) return true;
@@ -295,7 +295,7 @@ public sealed partial class MutableString : IEnumerable<char>, IEnumerable, IEqu
 	/// </exception>
 	public int IndexOf(char value, int index)
 	{
-		return Array.IndexOf(this.buffer, value, index, this.length - index); 
+		return Array.IndexOf(this.buffer, value, index, this.length - index);
 	}
 
 	/// <summary>
@@ -346,6 +346,20 @@ public sealed partial class MutableString : IEnumerable<char>, IEnumerable, IEqu
 		return -1;
 	}
 
+	/// <summary>
+	/// Creates a new span over current string.
+	/// </summary>
+	/// <remarks>
+	/// The string length shall not be modified during span lifetime!
+	/// </remarks>
+	/// <returns>Span instance pointing on internal buffer.</returns>
+	[MethodImpl(MethodImplOptions.AggressiveInlining)]
+	public Span<char> AsSpan()
+	{
+		ref char buffer = ref MemoryMarshal.GetArrayDataReference(this.buffer);
+		return MemoryMarshal.CreateSpan(ref buffer, this.length);
+	}
+
 	[MethodImpl(MethodImplOptions.AggressiveInlining)]
 	private int GetNewCapacity(int requiredCapacity)
 	{
@@ -354,7 +368,7 @@ public sealed partial class MutableString : IEnumerable<char>, IEnumerable, IEqu
 		if ((uint)newCapacity > Array.MaxLength) newCapacity = Array.MaxLength;
 
 		if (newCapacity < requiredCapacity) newCapacity = requiredCapacity;
-	
+
 		return newCapacity;
 	}
 
@@ -441,7 +455,7 @@ public sealed partial class MutableString : IEnumerable<char>, IEnumerable, IEqu
 
 		return true;
 	}
-	
+
 	/// <inheritdoc/>
 	public IEnumerator<char> GetEnumerator()
 	{
