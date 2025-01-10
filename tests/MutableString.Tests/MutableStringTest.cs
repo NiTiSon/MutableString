@@ -1,4 +1,4 @@
-﻿using NUnit.Framework;
+using NUnit.Framework;
 using System;
 
 namespace NiTiS;
@@ -103,6 +103,7 @@ internal class MutableStringTest
 		Assert.IsFalse(s.Contains('8'));
 	}
 
+	[Test]
 	public void IndexOf_Char()
 	{
 		MutableString s = new("Amongus is sus?7");
@@ -142,5 +143,55 @@ internal class MutableStringTest
 		});
 
 		Assert.AreEqual(-1, s.IndexOf('Я', 0, 0));
+	}
+
+	[Test]
+	public void IndexOf_ReadOnlySpan()
+	{
+		MutableString s = new("Amongus is sus?7");
+
+		Assert.AreEqual(0, s.IndexOf("Amongus"));
+		Assert.AreEqual(8, s.IndexOf("is"));
+		Assert.AreEqual(-1, s.IndexOf('Я'));
+
+		Assert.AreEqual(-1, s.IndexOf("as;dskjalkdjalsjdalskjdlaskjdalsk"));
+	}
+
+	[Test]
+	public void IndexOf_ReadOnlySpan2()
+	{
+		MutableString s = new("Amongus is sus?7");
+
+		Assert.AreEqual(0, s.IndexOf("A", 0, 1));
+		Assert.AreEqual(-1, s.IndexOf("7", 0, 1));
+		Assert.AreEqual(-1, s.IndexOf("Я", 0, 1));
+
+		Assert.AreEqual(-1, s.IndexOf("sus?71221-1203-12", 0, s.Length));
+
+		Assert.AreEqual(6, s.IndexOf("s", 0));
+		Assert.AreEqual(9, s.IndexOf("s", 7));
+		Assert.AreEqual(11, s.IndexOf("s", 10, 2));
+		Assert.AreEqual(13, s.IndexOf("s", 12, 2));
+		Assert.AreEqual(13, s.IndexOf("s", 12, 3));
+		Assert.AreEqual(-1, s.IndexOf("s", 12, 1));
+
+		Assert.Throws<ArgumentOutOfRangeException>(() =>
+		{
+			s.IndexOf("x", -1);
+		});
+
+		Assert.Throws<ArgumentOutOfRangeException>(() =>
+		{
+			s.IndexOf("x", -1, 0);
+		});
+
+		Assert.Throws<ArgumentOutOfRangeException>(() =>
+		{
+			s.IndexOf("x", 0, -1);
+		});
+
+		Assert.AreEqual(-1, s.IndexOf("Я", 0, 0));
+
+		Assert.AreEqual(0, s.IndexOf("", 0, 0));
 	}
 }
