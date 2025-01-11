@@ -3,6 +3,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
@@ -434,6 +435,73 @@ public sealed partial class MutableString : IEnumerable<char>, IEnumerable, IEqu
 	{
 		ref char buffer = ref MemoryMarshal.GetArrayDataReference(this.buffer);
 		return MemoryMarshal.CreateSpan(ref buffer, this.length);
+	}
+
+	/// <summary>
+	/// Copies the current string to the specified destination array.
+	/// </summary>
+	/// <param name="destination">The array to which the string will be copied.</param>
+	/// <exception cref="ArgumentNullException"><paramref name="destination"/> is null.</exception>
+	/// <exception cref="ArgumentException">
+	/// <paramref name="destination"/> array is not long enough.
+	/// </exception>
+	public void CopyTo(char[] destination)
+	{
+		Array.Copy(this.buffer, 0, destination, 0, this.length);
+	}
+
+	/// <summary>
+	/// Copies the current string to the specified destination array at specified <paramref name="index"/>.
+	/// </summary>
+	/// <param name="destination">The array to which the string will be copied.</param>
+	/// <param name="index">The zero-based index in the array at which storing begins.</param>
+	/// <exception cref="ArgumentNullException"><paramref name="destination"/> is null.</exception>
+	/// <exception cref="ArgumentOutOfRangeException">
+	/// <paramref name="index"/> is less than the lower bound of the first dimension of destinationArray.
+	/// </exception>
+	/// <exception cref="ArgumentException">
+	/// Region from <paramref name="index"/> to the end of <paramref name="destination"/> is not long enough.
+	/// </exception>
+	public void CopyTo(char[] destination, int index)
+	{
+		Array.Copy(this.buffer, 0, destination, index, this.length - index);
+	}
+
+	/// <summary>
+	/// Copies the current string to the specified destination array at specified <paramref name="index"/>.
+	/// </summary>
+	/// <param name="destination">The array to which the string will be copied.</param>
+	/// <param name="index">The zero-based index in the array at which storing begins.</param>
+	/// <param name="count">The number of characters to copy.</param>
+	/// <exception cref="ArgumentNullException"><paramref name="destination"/> is null.</exception>
+	/// <exception cref="ArgumentOutOfRangeException">
+	/// <paramref name="index"/> is less than the lower bound of the first dimension of destinationArray.
+	/// -or-
+	/// <paramref name="count"/> is less than zero.
+	/// </exception>
+	/// <exception cref="ArgumentException">
+	/// <paramref name="count"/> is greater than the number of elements from <paramref name="index"/> to the end of <paramref name="destination"/>.
+	/// </exception>
+	public void CopyTo(char[] destination, int index, int count)
+	{
+		if (count > this.length)
+		{
+			ThrowHelper.ThrowArgumentOutOfRangeException(nameof(count), "Number of copying characters is greater than the string length.");
+		}
+
+		Array.Copy(this.buffer, 0, destination, index, count);
+	}
+
+	/// <summary>
+	/// Copies the current string to the specified destination span.
+	/// </summary>
+	/// <param name="destination">The span to which the string will be copied.</param>
+	/// <exception cref="ArgumentException">
+	/// The string length is greater than the available <paramref name="destination"/> memory.
+	/// </exception>
+	public void CopyTo(Span<char> destination)
+	{
+		AsSpan().CopyTo(destination);
 	}
 
 	[MethodImpl(MethodImplOptions.AggressiveInlining)]

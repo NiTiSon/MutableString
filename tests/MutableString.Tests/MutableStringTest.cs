@@ -194,4 +194,37 @@ internal class MutableStringTest
 
 		Assert.AreEqual(0, s.IndexOf("", 0, 0));
 	}
+
+	[Test]
+	public void CopyTo()
+	{
+		MutableString s = new("1234567890X");
+		char[] dst = new char[10];
+		char[] dst2 = new char[11];
+
+		Assert.Throws<ArgumentException>(() => // Not long enough
+		{
+			s.CopyTo(dst);
+		});
+
+		Assert.Throws<ArgumentOutOfRangeException>(() =>
+		{
+			s.CopyTo(dst2, -1);
+		});
+
+		Assert.Throws<ArgumentOutOfRangeException>(() =>
+		{
+			s.CopyTo(dst2, 0, 12);
+		});
+	}
+
+	[Test]
+	public void AsSpan()
+	{
+		MutableString s = new("Hello world");
+
+		Assert.AreEqual(s.Length, s.AsSpan().Length);
+
+		//Assert.IsTrue(s.Equals(s.AsSpan());
+	}
 }
