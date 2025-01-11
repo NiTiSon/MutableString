@@ -8,6 +8,26 @@ without incurring the overhead of creating new string instances for each operati
 This package provides new types:
 + NiTiS.MutableString
 
+## Installing
+
+### Via PackageReference
+Append `PackageReference` node to your C# project file
+```csproj
+<Project Sdk="Microsoft.NET.Sdk">
+...
+	<ItemGroup>
+		...
+		<!-- Append next line into your project file -->
+		<PackageReference Include="MutableString" />
+	</ItemGroup>
+...
+</Project>
+```
+### Via .NET CLI
+```sh
+dotnet add package MutableString
+```
+
 ## Contributing
 Contributions are welcome!
 Please read [CONTRIBUTING.md](https://github.com/NiTiSon/MutableString/blob/stable/CONTRIBUTING.md) before making any contribution to repository.
