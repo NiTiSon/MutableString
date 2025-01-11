@@ -178,7 +178,7 @@ public sealed partial class MutableString : IEnumerable<char>, IEnumerable, IEqu
 	/// </summary>
 	/// <param name="index">Index to insert character.</param>
 	/// <param name="value">Character to insert.</param>
-	/// <returns>A reference to this instance after the append operation is completed.</returns>
+	/// <returns>A reference to this instance after the insert operation is completed.</returns>
 	/// <exception cref="ArgumentOutOfRangeException"><paramref name="index"/> are out of string bounds.</exception>
 	public MutableString Insert(int index, char value)
 	{
@@ -209,7 +209,7 @@ public sealed partial class MutableString : IEnumerable<char>, IEnumerable, IEqu
 	/// </summary>
 	/// <param name="index">Index to insert string.</param>
 	/// <param name="value">String to insert.</param>
-	/// <returns>A reference to this instance after the append operation is completed.</returns>
+	/// <returns>A reference to this instance after the insert operation is completed.</returns>
 	/// <exception cref="ArgumentOutOfRangeException"><paramref name="index"/> are out of string bounds.</exception>
 	public MutableString Insert(int index, ReadOnlySpan<char> value)
 	{
@@ -260,11 +260,21 @@ public sealed partial class MutableString : IEnumerable<char>, IEnumerable, IEqu
 	/// <summary>
 	/// Reverse character order of this string.
 	/// </summary>
-	/// <returns>A reference to this instance after the append operation is completed.</returns>
+	/// <returns>A reference to this instance after the reverse operation is completed.</returns>
 	public MutableString Reverse()
 	{
 		Array.Reverse(buffer, 0, length);
 
+		return this;
+	}
+
+	/// <summary>
+	/// Set string length to 0 (zero).
+	/// </summary>
+	/// <returns>A reference to this instance after the clear operation is completed.</returns>
+	public MutableString Clear()
+	{
+		length = 0;
 		return this;
 	}
 
