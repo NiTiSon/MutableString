@@ -586,9 +586,20 @@ public sealed partial class MutableString : IEnumerable<char>, IEnumerable, IEqu
 #else
 		Guard.IsNotNull(other);
 #endif
+		return this.Equals(other!.AsSpan());
+	}
+
+	/// <summary>
+	/// Returns a value indicating whether the characters in this instance
+	/// are equal to the characters in a specified span.
+	/// </summary>
+	/// <param name="other">The character span to compare with current instance.</param>
+	/// <returns><see langword="true"/> if <paramref name="other"/> content are same; otherwise, <see langword="false"/>.</returns>
+	public bool Equals(ReadOnlySpan<char> other)
+	{
 		if (other!.Length != this.length) return false;
 
-		ref char otherReference = ref MemoryMarshal.GetReference(other.AsSpan());
+		ref char otherReference = ref MemoryMarshal.GetReference(other);
 		ref char thisReference = ref MemoryMarshal.GetArrayDataReference(this.buffer); // Must be ref readonly, but Unsafe.Add allows only refs
 		int length = this.length;
 

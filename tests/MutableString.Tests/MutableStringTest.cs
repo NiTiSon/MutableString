@@ -225,6 +225,7 @@ internal class MutableStringTest
 
 		Assert.AreEqual(s.Length, s.AsSpan().Length);
 
-		//Assert.IsTrue(s.Equals(s.AsSpan());
+		Assert.IsTrue(s.Equals(s.AsSpan()));
+		Assert.IsFalse(s.Equals(s.AsSpan()[..1]));
 	}
 }
