@@ -293,6 +293,16 @@ public sealed partial class MutableString : IEnumerable<char>, IEnumerable, IEqu
 	}
 
 	/// <summary>
+	/// Returns a value indicating whether a specified substring occurs within this string.
+	/// </summary>
+	/// <param name="value">The substring to seek.</param>
+	/// <returns><see langword="true"/> if substring contains within string; otherwise, <see langword="false"/>.</returns>
+	public bool Contains(ReadOnlySpan<char> value)
+	{
+		return IndexOf(value) != -1;
+	}
+
+	/// <summary>
 	/// Reverse character order of this string.
 	/// </summary>
 	/// <returns>A reference to this instance after the reverse operation is completed.</returns>

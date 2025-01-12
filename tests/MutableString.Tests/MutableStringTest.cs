@@ -136,6 +136,16 @@ internal sealed class MutableStringTest
 	}
 
 	[Test]
+	public void Contains_ReadOnlySpan()
+	{
+		MutableString s = new("Amongus is sus?7");
+
+		Assert.IsFalse(s.Contains("Xi"));
+		Assert.IsFalse(s.Contains("Ox120-312-30912-3012-03912-312"));
+		Assert.IsTrue(s.Contains("sus"));
+	}
+
+	[Test]
 	public void IndexOf_Char()
 	{
 		MutableString s = new("Amongus is sus?7");
