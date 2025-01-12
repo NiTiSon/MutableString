@@ -147,16 +147,10 @@ public sealed partial class MutableString : IEnumerable<char>, IEnumerable, IEqu
 		return new MutableString(this.buffer, 0, this.length);
 	}
 
-	// TODO:
-	// Replace
-	// Shift/Rotate?
-	// IndexOfAny
-	// StartsWith/EndsWith
-
 	/// <summary>
 	/// Appends the string representation of a specified <see cref="char"/> object to this <see cref="MutableString"/> instance.
 	/// </summary>
-	/// <param name="value"></param>
+	/// <param name="value">Character to append to this string.</param>
 	/// <returns>A reference to this instance after the append operation is completed.</returns>
 	public MutableString Append(char value)
 	{
@@ -166,7 +160,7 @@ public sealed partial class MutableString : IEnumerable<char>, IEnumerable, IEqu
 	/// <summary>
 	/// Appends the string representation of a specified read-only character span to this <see cref="MutableString"/> instance.
 	/// </summary>
-	/// <param name="value"></param>
+	/// <param name="value">String span to append to this string.</param>
 	/// <returns>A reference to this instance after the append operation is completed.</returns>
 	public MutableString Append(ReadOnlySpan<char> value)
 	{
@@ -174,7 +168,47 @@ public sealed partial class MutableString : IEnumerable<char>, IEnumerable, IEqu
 	}
 
 	/// <summary>
-	/// Insert character in <see cref="MutableString"/> at <paramref name="index"/>.
+	/// Remove specified region in <see cref="MutableString"/>.
+	/// </summary>
+	/// <param name="index">Index to remove characters.</param>
+	/// <param name="length">Length of removed characters.</param>
+	/// <returns>A reference to this instance after the remove operation is completed.</returns>
+	/// <exception cref="ArgumentOutOfRangeException">
+	/// <paramref name="index"/> is negative.
+	/// -or-
+	/// <paramref name="length"/> is negative or zero.
+	/// </exception>
+	/// <exception cref="ArgumentException">
+	/// <paramref name="length"/> is greater than the number of elements from <paramref name="index"/> to the end of this string.
+	/// </exception>
+	public MutableString Remove(int index, int length)
+	{
+#if NET8_0_OR_GREATER
+		ArgumentOutOfRangeException.ThrowIfNegative(index);
+		ArgumentOutOfRangeException.ThrowIfNegativeOrZero(length);
+#else
+		Guard.IsGreaterThanOrEqualTo(index, 0);
+		Guard.IsGreaterThan(length, 0);
+#endif
+		int lastRemoveIndex = index + length;
+
+		if (lastRemoveIndex > this.length)
+		{
+			ThrowHelper.ThrowArgumentException(nameof(length), "length and index do not present valid region within string.");
+		}
+
+		if (lastRemoveIndex != this.length) // Remove region is in between or at begin
+		{
+			Array.Copy(this.buffer, lastRemoveIndex, this.buffer, index, this.length - lastRemoveIndex);
+		}
+
+		this.length -= length;
+
+		return this;
+	}
+
+	/// <summary>
+	/// Insert character in <see cref="MutableString"/> at specified <paramref name="index"/>.
 	/// If required, the string capacity may be increased.
 	/// </summary>
 	/// <param name="index">Index to insert character.</param>

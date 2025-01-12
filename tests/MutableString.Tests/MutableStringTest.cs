@@ -3,8 +3,40 @@ using System;
 
 namespace NiTiS;
 
-internal class MutableStringTest
+internal sealed class MutableStringTest
 {
+	[Test]
+	public void Remove()
+	{
+		MutableString str = new("12345");
+
+		str.Remove(2, 2);
+		Assert.AreEqual("125", str.ToString());
+
+
+		str.Remove(0, 1);
+		Assert.AreEqual("25", str.ToString());
+
+
+		str.Remove(str.Length - 1, 1);
+		Assert.AreEqual("2", str.ToString());
+
+		Assert.Throws<ArgumentException>(() =>
+		{
+			str.Remove(1, 1);
+		});
+
+		Assert.Throws<ArgumentOutOfRangeException>(() =>
+		{
+			str.Remove(0, 0);
+		});
+
+		Assert.Throws<ArgumentOutOfRangeException>(() =>
+		{
+			str.Remove(-1, 1);
+		});
+	}
+
 	[Test]
 	public void Insert_Char()
 	{
