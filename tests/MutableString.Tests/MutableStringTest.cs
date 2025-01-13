@@ -6,6 +6,20 @@ namespace NiTiS;
 internal sealed class MutableStringTest
 {
 	[Test]
+	public void Reverse()
+	{
+		MutableString str = new();
+
+		Assert.DoesNotThrow(() => str.Reverse());
+
+		MutableString str2 = new("12345");
+
+		str2.Reverse();
+
+		Assert.AreEqual("54321", str2.ToString());
+	}
+
+	[Test]
 	public void Remove()
 	{
 		MutableString str = new("12345");
