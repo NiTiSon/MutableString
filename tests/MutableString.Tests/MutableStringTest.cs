@@ -284,4 +284,17 @@ internal sealed class MutableStringTest
 		Assert.IsTrue(s.Equals(s.AsSpan()));
 		Assert.IsFalse(s.Equals(s.AsSpan()[..1]));
 	}
+
+	[Test]
+	public new void ToString()
+	{
+		MutableString str = new("abc345вгд");
+
+		Assert.AreEqual("345вгд", str.ToString(3));
+		Assert.AreEqual("345", str.ToString(3, 3));
+		Assert.AreEqual("вгд", str.ToString(6));
+		Assert.AreEqual("вгд", str.ToString(6, 3));
+
+		Assert.AreEqual(str.ToString(), str.ToString(0, str.Length));
+	}
 }

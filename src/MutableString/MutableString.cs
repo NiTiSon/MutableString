@@ -673,7 +673,65 @@ public sealed partial class MutableString : IEnumerable<char>, IEnumerable, IEqu
 	/// <returns>A new <see cref="string"/> instance with same content.</returns>
 	public override string ToString()
 	{
-		return new string(buffer, 0, length);
+		return new string(this.buffer, 0, this.length);
+	}
+
+	/// <summary>
+	/// Copy content of <see cref="MutableString"/> to new immutable <see cref="string"/> starting at specified <paramref name="index"/>.
+	/// </summary>
+	/// <param name="index">The zero-based starting index of the string creation.</param>
+	/// <returns>A new <see cref="string"/> instance with substring of current mutable string.</returns>
+	/// <exception cref="ArgumentOutOfRangeException">
+	/// <paramref name="index"/> is negative.
+	/// -or-
+	/// <paramref name="index"/> is out of string bounds.
+	/// </exception>
+	public string ToString(int index)
+	{
+#if NET8_0_OR_GREATER
+		ArgumentOutOfRangeException.ThrowIfNegative(index);
+		ArgumentOutOfRangeException.ThrowIfGreaterThanOrEqual(index, this.length);
+#else
+		Guard.IsGreaterThanOrEqualTo(index, 0);
+		Guard.IsLessThan(index, this.length);
+#endif
+
+		return new string(this.buffer, index, this.length - index);
+	}
+
+	/// <summary>
+	/// Copy content of <see cref="MutableString"/> to new immutable <see cref="string"/> starting at specified <paramref name="index"/> with specified <paramref name="length"/>.
+	/// </summary>
+	/// <param name="index">The zero-based starting index of the string creation.</param>
+	/// <param name="length">The number of characters to copy from the current string.</param>
+	/// <returns>A new <see cref="string"/> instance with substring of current mutable string.</returns>
+	/// <exception cref="ArgumentOutOfRangeException">
+	/// <paramref name="index"/> is negative.
+	/// -or-
+	/// <paramref name="index"/> is out of string bounds.
+	/// -or-
+	/// <paramref name="length"/> is negative.
+	/// </exception>
+	/// <exception cref="ArgumentException">
+	/// Substring at specified <paramref name="index"/> with specified <paramref name="length"/> is not valid within this string.
+	/// </exception>
+	public string ToString(int index, int length)
+	{
+#if NET8_0_OR_GREATER
+		ArgumentOutOfRangeException.ThrowIfNegative(index);
+		ArgumentOutOfRangeException.ThrowIfNegative(length);
+		ArgumentOutOfRangeException.ThrowIfGreaterThanOrEqual(index, this.length);
+#else
+		Guard.IsGreaterThanOrEqualTo(index, 0);
+		Guard.IsGreaterThanOrEqualTo(length, 0);
+		Guard.IsLessThan(index, this.length);
+#endif
+		if (length > this.length - index)
+		{
+			ThrowHelper.ThrowArgumentException(nameof(length));
+		}
+
+		return new string(this.buffer, index, length);
 	}
 
 	/// <inheritdoc/>
