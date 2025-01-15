@@ -19,17 +19,19 @@ internal sealed class MutableStringTest
 		Assert.AreEqual("54321", str2.ToString());
 	}
 
+	[Test]
 	public void StartsWith()
 	{
 		MutableString s = new("t23123123zxc981231z");
 
-		Assert.IsTrue(s.EndsWith('t'));
-		Assert.IsTrue(s.EndsWith("t"));
-		Assert.IsTrue(s.EndsWith("t2312"));
+		Assert.IsTrue(s.StartsWith('t'));
+		Assert.IsTrue(s.StartsWith("t"));
+		Assert.IsTrue(s.StartsWith("t2312"));
 
 		Assert.IsFalse(s.StartsWith(""));
 	}
 
+	[Test]
 	public void EndsWith()
 	{
 		MutableString s = new("t23123123zxc981231z");
@@ -307,6 +309,7 @@ internal sealed class MutableStringTest
 		Assert.IsFalse(s.Equals(s.AsSpan()[..1]));
 	}
 
+	[Test]
 	public void Chars()
 	{
 		MutableString s = new("xyz");
