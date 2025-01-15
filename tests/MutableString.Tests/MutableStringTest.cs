@@ -285,6 +285,26 @@ internal sealed class MutableStringTest
 		Assert.IsFalse(s.Equals(s.AsSpan()[..1]));
 	}
 
+	public void Chars()
+	{
+		MutableString s = new("xyz");
+
+		Assert.AreEqual('x', s[0]);
+		Assert.AreEqual('y', s[1]);
+		Assert.AreEqual('z', s[2]);
+
+		Assert.Throws<ArgumentOutOfRangeException>(() =>
+		{
+			_ = s[-1];
+		});
+
+
+		Assert.Throws<ArgumentOutOfRangeException>(() =>
+		{
+			_ = s[s.Length];
+		});
+	}
+
 	[Test]
 	public new void ToString()
 	{

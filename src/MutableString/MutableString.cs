@@ -3,7 +3,6 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
@@ -26,15 +25,20 @@ public sealed partial class MutableString : IEnumerable<char>, IEnumerable, IEqu
 	public int Capacity => buffer.Length;
 
 	/// <summary>
-	/// Length of current <see cref="MutableString"/>.
+	/// Get or set current <see cref="MutableString"/> length.
 	/// </summary>
+	/// <exception cref="ArgumentOutOfRangeException">
+	/// Value is greater than string buffer.
+	/// </exception>
 	public int Length
 	{
 		get => length;
-		//set
-		//{
+		set
+		{
+			Guard.IsLessThanOrEqualTo(value, buffer.Length);
 
-		//}
+			length = value;
+		}
 	}
 
 	/// <summary>
@@ -125,18 +129,37 @@ public sealed partial class MutableString : IEnumerable<char>, IEnumerable, IEqu
 		value.CopyTo(this.buffer, startIndex);
 	}
 
-	//[IndexerName("Chars")]
-	//public char this[int index]
-	//{
-	//	get
-	//	{
-	//		return buffer[index];
-	//	}
-	//	set
-	//	{
-	//		buffer[index] = value;
-	//	}
-	//}
+	/// <summary>
+	/// Get or set character at <paramref name="index"/> of this string.
+	/// </summary>
+	/// <param name="index">Index to get or set character.</param>
+	/// <returns>Character at <paramref name="index"/> within this string.</returns>
+	[IndexerName("Chars")]
+	public char this[int index]
+	{
+		get
+		{
+#if NET8_0_OR_GREATER
+			ArgumentOutOfRangeException.ThrowIfGreaterThan((uint)index, (uint)length);
+			ArgumentOutOfRangeException.ThrowIfNegative(index);
+#else
+			Guard.IsLessThan((uint)index, (uint)length);
+			Guard.IsGreaterThanOrEqualTo(index, 0);
+#endif
+			return buffer[index];
+		}
+		set
+		{
+#if NET8_0_OR_GREATER
+			ArgumentOutOfRangeException.ThrowIfGreaterThan((uint)index, (uint)length);
+			ArgumentOutOfRangeException.ThrowIfNegative(index);
+#else
+			Guard.IsLessThan((uint)index, (uint)length);
+			Guard.IsGreaterThanOrEqualTo(index, 0);
+#endif
+			buffer[index] = value;
+		}
+	}
 
 	/// <summary>
 	/// Create new <see cref="MutableString"/> instance with same content.
