@@ -19,6 +19,28 @@ internal sealed class MutableStringTest
 		Assert.AreEqual("54321", str2.ToString());
 	}
 
+	public void StartsWith()
+	{
+		MutableString s = new("t23123123zxc981231z");
+
+		Assert.IsTrue(s.EndsWith('t'));
+		Assert.IsTrue(s.EndsWith("t"));
+		Assert.IsTrue(s.EndsWith("t2312"));
+
+		Assert.IsFalse(s.StartsWith(""));
+	}
+
+	public void EndsWith()
+	{
+		MutableString s = new("t23123123zxc981231z");
+
+		Assert.IsTrue(s.EndsWith('z'));
+		Assert.IsTrue(s.EndsWith("z"));
+		Assert.IsTrue(s.EndsWith("31z"));
+
+		Assert.IsFalse(s.EndsWith(""));
+	}
+
 	[Test]
 	public void Remove()
 	{

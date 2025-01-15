@@ -171,6 +171,58 @@ public sealed partial class MutableString : IEnumerable<char>, IEnumerable, IEqu
 	}
 
 	/// <summary>
+	/// Determines whether this string instance starts with the specified character.
+	/// </summary>
+	/// <param name="value">The character to compare.</param>
+	/// <returns><see langword="true"/> if <paramref name="value"/> matches the beginning of this string; otherwise, <see langword="false"/>.</returns>
+	public bool StartsWith(char value)
+	{
+		return this.buffer.Length > 0 && this.buffer[0] == value;
+	}
+
+	/// <summary>
+	/// Determines whether the beginning of this string instance matches the specified span.
+	/// </summary>
+	/// <param name="value">The span to compare.</param>
+	/// <returns><see langword="true"/> if <paramref name="value"/> matches the beginning of this string; otherwise, <see langword="false"/>.</returns>
+	public bool StartsWith(ReadOnlySpan<char> value)
+	{
+		if (value.Length >= this.length)
+		{
+			return IndexOf(value, 0, value.Length) == 0;
+		}
+
+		return false;
+	}
+
+	/// <summary>
+	/// Determines whether the end of this string instance matches the specified character.
+	/// </summary>
+	/// <param name="value">The character to compare to the character at the end of this instance.</param>
+	/// <returns><see langword="true"/> if <paramref name="value"/> matches the end of this instance; otherwise, <see langword="false"/>.</returns>
+	public bool EndsWith(char value)
+	{
+		return this.buffer.Length > 0 && this.buffer[^0] == value;
+	}
+
+
+	/// <summary>
+	/// Determines whether the end of this string instance matches the specified span.
+	/// </summary>
+	/// <param name="value">The span to compare to the substring at the end of this instance.</param>
+	/// <returns><see langword="true"/> if <paramref name="value"/> matches the end of this instance; otherwise, <see langword="false"/>.</returns>
+	public bool EndsWith(ReadOnlySpan<char> value)
+	{
+		if (value.Length >= this.length)
+		{
+			int requiredIndex = this.length - value.Length;
+			return IndexOf(value, requiredIndex, value.Length) == requiredIndex;
+		}
+
+		return false;
+	}
+
+	/// <summary>
 	/// Appends the string representation of a specified <see cref="char"/> object to this <see cref="MutableString"/> instance.
 	/// </summary>
 	/// <param name="value">Character to append to this string.</param>
