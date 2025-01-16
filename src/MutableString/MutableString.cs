@@ -525,7 +525,7 @@ public sealed partial class MutableString : IEnumerable<char>, IEnumerable, IEqu
 			ThrowHelper.ThrowArgumentOutOfRangeException(nameof(count), "Index and count do not specify a valid section in the string.");
 		}
 
-		if (value.Length == 0) return 0;
+		if (value.Length == 0) return index;
 
 		ref char buffer = ref MemoryMarshal.GetArrayDataReference(this.buffer);
 		ref char other = ref MemoryMarshal.GetReference(value);

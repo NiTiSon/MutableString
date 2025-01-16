@@ -257,6 +257,8 @@ internal sealed class MutableStringTest
 		Assert.AreEqual(13, s.IndexOf("s", 12, 3));
 		Assert.AreEqual(-1, s.IndexOf("s", 12, 1));
 
+		Assert.AreEqual(2, s.IndexOf("", 2, 0)); // Empty strings are always found
+
 		Assert.Throws<ArgumentOutOfRangeException>(() =>
 		{
 			s.IndexOf("x", -1);
