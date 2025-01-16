@@ -140,7 +140,7 @@ public sealed partial class MutableString : IEnumerable<char>, IEnumerable, IEqu
 		get
 		{
 #if NET8_0_OR_GREATER
-			ArgumentOutOfRangeException.ThrowIfGreaterThan((uint)index, (uint)length);
+			ArgumentOutOfRangeException.ThrowIfGreaterThanOrEqual((uint)index, (uint)length);
 			ArgumentOutOfRangeException.ThrowIfNegative(index);
 #else
 			Guard.IsLessThan((uint)index, (uint)length);
@@ -151,7 +151,7 @@ public sealed partial class MutableString : IEnumerable<char>, IEnumerable, IEqu
 		set
 		{
 #if NET8_0_OR_GREATER
-			ArgumentOutOfRangeException.ThrowIfGreaterThan((uint)index, (uint)length);
+			ArgumentOutOfRangeException.ThrowIfGreaterThanOrEqual((uint)index, (uint)length);
 			ArgumentOutOfRangeException.ThrowIfNegative(index);
 #else
 			Guard.IsLessThan((uint)index, (uint)length);
