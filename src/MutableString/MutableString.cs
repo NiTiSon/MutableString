@@ -827,5 +827,23 @@ public sealed partial class MutableString : IEnumerable<char>, IEnumerable, IEqu
 		return this.ToString().GetHashCode();
 	}
 
-#endregion
+	#endregion
+
+	/// <summary>
+	/// Defines an implicit conversion of read-only span of characters to mutable string.
+	/// </summary>
+	/// <param name="str">A span to implicitly convert.</param>
+	public static implicit operator MutableString(ReadOnlySpan<char> str)
+	{
+		return new MutableString(str);
+	}
+
+	/// <summary>
+	/// Defines an implicit conversion of immutable string to mutable string.
+	/// </summary>
+	/// <param name="str">A string to implicitly convert.</param>
+	public static implicit operator MutableString(string str)
+	{
+		return new MutableString(str);
+	}
 }
