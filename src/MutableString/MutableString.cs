@@ -543,6 +543,18 @@ public sealed partial class MutableString : IEnumerable<char>, IEnumerable, IEqu
 	}
 
 	/// <summary>
+	/// Reports the zero-based index of the first occurrence in this instance of any character in a specified span of Unicode characters.
+	/// </summary>
+	/// <param name="values">A Unicode character span containing one or more characters to seek.</param>
+	/// <returns>
+	/// The zero-based index position of the first occurrence in this instance where any character in anyOf was found; -1 if no character in anyOf was found.
+	/// </returns>
+	public int IndexOfAny(params ReadOnlySpan<char> values)
+	{
+		return MemoryMarshal.CreateReadOnlySpan(ref MemoryMarshal.GetArrayDataReference(this.buffer), Length).IndexOfAny(values);
+	}
+
+	/// <summary>
 	/// Creates a new span over current string.
 	/// </summary>
 	/// <remarks>

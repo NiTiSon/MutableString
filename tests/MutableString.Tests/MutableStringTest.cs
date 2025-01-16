@@ -280,6 +280,17 @@ internal sealed class MutableStringTest
 	}
 
 	[Test]
+	public void IndexOfAny()
+	{
+		MutableString str = new("Kzwstne");
+
+		Assert.AreEqual(2, str.IndexOfAny('x', 'w', 'e'));
+		Assert.AreEqual(6, str.IndexOfAny('x', 'e'));
+
+		Assert.AreEqual(-1, str.IndexOfAny());
+	}
+
+	[Test]
 	public void CopyTo()
 	{
 		MutableString s = new("1234567890X");
