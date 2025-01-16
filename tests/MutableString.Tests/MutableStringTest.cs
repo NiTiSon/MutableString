@@ -27,8 +27,9 @@ internal sealed class MutableStringTest
 		Assert.IsTrue(s.StartsWith('t'));
 		Assert.IsTrue(s.StartsWith("t"));
 		Assert.IsTrue(s.StartsWith("t2312"));
+		Assert.IsFalse(s.StartsWith("t2312я"));
 
-		Assert.IsFalse(s.StartsWith(""));
+		Assert.IsTrue(s.StartsWith(""));
 	}
 
 	[Test]
@@ -39,8 +40,9 @@ internal sealed class MutableStringTest
 		Assert.IsTrue(s.EndsWith('z'));
 		Assert.IsTrue(s.EndsWith("z"));
 		Assert.IsTrue(s.EndsWith("31z"));
+		Assert.IsFalse(s.EndsWith("31z2"));
 
-		Assert.IsFalse(s.EndsWith(""));
+		Assert.IsTrue(s.EndsWith(""));
 	}
 
 	[Test]

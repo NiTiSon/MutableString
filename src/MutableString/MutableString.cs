@@ -187,7 +187,7 @@ public sealed partial class MutableString : IEnumerable<char>, IEnumerable, IEqu
 	/// <returns><see langword="true"/> if <paramref name="value"/> matches the beginning of this string; otherwise, <see langword="false"/>.</returns>
 	public bool StartsWith(ReadOnlySpan<char> value)
 	{
-		if (value.Length >= this.length)
+		if (value.Length <= this.length)
 		{
 			return IndexOf(value, 0, value.Length) == 0;
 		}
@@ -202,7 +202,7 @@ public sealed partial class MutableString : IEnumerable<char>, IEnumerable, IEqu
 	/// <returns><see langword="true"/> if <paramref name="value"/> matches the end of this instance; otherwise, <see langword="false"/>.</returns>
 	public bool EndsWith(char value)
 	{
-		return this.buffer.Length > 0 && this.buffer[^0] == value;
+		return this.buffer.Length > 0 && this.buffer[^1] == value;
 	}
 
 
@@ -213,7 +213,7 @@ public sealed partial class MutableString : IEnumerable<char>, IEnumerable, IEqu
 	/// <returns><see langword="true"/> if <paramref name="value"/> matches the end of this instance; otherwise, <see langword="false"/>.</returns>
 	public bool EndsWith(ReadOnlySpan<char> value)
 	{
-		if (value.Length >= this.length)
+		if (value.Length <= this.length)
 		{
 			int requiredIndex = this.length - value.Length;
 			return IndexOf(value, requiredIndex, value.Length) == requiredIndex;
@@ -512,7 +512,7 @@ public sealed partial class MutableString : IEnumerable<char>, IEnumerable, IEqu
 	/// </exception>
 	public int IndexOf(ReadOnlySpan<char> value, int index, int count)
 	{
-		if (index < 0 || index >= this.length)
+		if (index < 0 /* || index >= this.length */)
 		{
 			ThrowHelper.ThrowArgumentOutOfRangeException(nameof(index), "Index is outside the range of valid indexes for the string.");
 		}
