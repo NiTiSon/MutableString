@@ -26,4 +26,3 @@ jobs:
     - name: NuGet publish
       run: |
         dotnet nuget push outPackages/*.nupkg --api-key ${{ secrets.NUGET_TOKEN }} --source https://api.nuget.org/v3/index.json --skip-duplicate
-        dotnet nuget push outPackages/*.snupkg --api-key ${{ secrets.NUGET_TOKEN }} --source https://api.nuget.org/v3/index.json --skip-duplicate
