@@ -357,4 +357,18 @@ internal sealed class MutableStringTest
 
 		Assert.AreEqual(str.ToString(), str.ToString(0, str.Length));
 	}
+
+	[Test]
+	public unsafe void Fixed()
+	{
+		MutableString str = "Hello";
+
+		fixed (char* pStr = str)
+		{
+			pStr[0] = 'a';
+			pStr[str.Length - 1] = 'w';
+		}
+
+		Assert.AreEqual("aellw", str.ToString());
+	}
 }

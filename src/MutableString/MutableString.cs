@@ -2,6 +2,7 @@ using CommunityToolkit.Diagnostics;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
@@ -828,6 +829,18 @@ public sealed partial class MutableString : IEnumerable<char>, IEnumerable, IEqu
 	}
 
 	#endregion
+
+	/// <summary>
+	/// Returns a reference to the first character of the internal buffer.
+	/// This method is intended to support .NET compilers and is not intended to be called by user code.
+	/// </summary>
+	/// <returns>A reference to the first character of the internal buffer.</returns>
+	[Browsable(false)]
+	[EditorBrowsable(EditorBrowsableState.Never)]
+	public ref char GetPinnableReference()
+	{
+		return ref AsSpan().GetPinnableReference();
+	}
 
 	/// <summary>
 	/// Defines an implicit conversion of read-only span of characters to mutable string.
