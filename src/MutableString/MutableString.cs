@@ -284,6 +284,29 @@ public sealed partial class MutableString : IEnumerable<char>, IEnumerable, IEqu
 	}
 
 	/// <summary>
+	/// Replace all occurrences of a specified Unicode character in the instance to another specified Unicode character.
+	/// </summary>
+	/// <param name="oldChar">The Unicode character to be replaced.</param>
+	/// <param name="newChar">The Unicode character to replace all occurrences of oldChar.</param>
+	/// <returns>A reference to this instance after the replace operation is completed.</returns>
+	public MutableString Replace(char oldChar, char newChar)
+	{
+		if (oldChar == newChar) return this;
+
+		ref char buffer = ref MemoryMarshal.GetArrayDataReference(this.buffer);
+
+		for (int i = 0; i < length; i++)
+		{
+			if (Unsafe.Add(ref buffer, i) == oldChar)
+			{
+				Unsafe.Add(ref buffer, i) = newChar;
+			}
+		}
+
+		return this;
+	}
+
+	/// <summary>
 	/// Insert character in <see cref="MutableString"/> at specified <paramref name="index"/>.
 	/// If required, the string capacity may be increased.
 	/// </summary>

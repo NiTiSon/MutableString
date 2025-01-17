@@ -78,6 +78,16 @@ internal sealed class MutableStringTest
 	}
 
 	[Test]
+	public void Replaced_Char()
+	{
+		MutableString str = "Hello World";
+
+		str.Replace('o', 'Y');
+
+		Assert.AreEqual("HellY WYrld", str.ToString());
+	}
+
+	[Test]
 	public void Insert_Char()
 	{
 		MutableString s = new(capacity: 1);
