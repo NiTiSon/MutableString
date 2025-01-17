@@ -43,6 +43,33 @@ public sealed partial class MutableString : IEnumerable<char>, IEnumerable, IEqu
 	}
 
 	/// <summary>
+	/// <see langword="true"/> when <see cref="Length"/> is 0; otherwise, <see langword="false"/>.
+	/// </summary>
+	public bool IsEmpty
+	{
+		get => length == 0;
+	}
+
+	/// <summary>
+	/// <see langword="true"/> if string consists exclusively of white-space characters or empty; otherwise, <see langword="false"/>.
+	/// </summary>
+	public bool IsWhiteSpace
+	{
+		get
+		{
+			for (int i = 0; i < length; i++)
+			{
+				if (!char.IsWhiteSpace(buffer[i]))
+				{
+					return false;
+				}
+			}
+
+			return true;
+		}
+	}
+
+	/// <summary>
 	/// Initialize empty <see cref="MutableString"/> instance.
 	/// </summary>
 	public MutableString()
