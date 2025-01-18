@@ -6,6 +6,8 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+// ReSharper disable LocalVariableHidesMember
+// ReSharper disable ParameterHidesMember
 
 namespace NiTiS;
 
@@ -14,7 +16,7 @@ namespace NiTiS;
 /// </summary>
 [DebuggerDisplay("{ToString()}")]
 [DebuggerTypeProxy(typeof(MutableStringDebugView))]
-public sealed partial class MutableString : IEnumerable<char>, IEnumerable, IEquatable<MutableString?>, IEquatable<string?>
+public sealed partial class MutableString : IEnumerable<char>, IEquatable<MutableString?>, IEquatable<string?>
 {
 	private const int DefaultCapacity = 32;
 
@@ -46,10 +48,7 @@ public sealed partial class MutableString : IEnumerable<char>, IEnumerable, IEqu
 	/// <summary>
 	/// <see langword="true"/> when <see cref="Length"/> is 0; otherwise, <see langword="false"/>.
 	/// </summary>
-	public bool IsEmpty
-	{
-		get => length == 0;
-	}
+	public bool IsEmpty => length == 0;
 
 	/// <summary>
 	/// <see langword="true"/> if string consists exclusively of white-space characters or empty; otherwise, <see langword="false"/>.
@@ -216,12 +215,9 @@ public sealed partial class MutableString : IEnumerable<char>, IEnumerable, IEqu
 	/// <returns><see langword="true"/> if <paramref name="value"/> matches the beginning of this string; otherwise, <see langword="false"/>.</returns>
 	public bool StartsWith(ReadOnlySpan<char> value)
 	{
-		if (value.Length <= this.length)
-		{
-			return IndexOf(value, 0, value.Length) == 0;
-		}
+		if (value.Length > this.length) return false;
 
-		return false;
+		return IndexOf(value, 0, value.Length) == 0;
 	}
 
 	/// <summary>
@@ -242,13 +238,10 @@ public sealed partial class MutableString : IEnumerable<char>, IEnumerable, IEqu
 	/// <returns><see langword="true"/> if <paramref name="value"/> matches the end of this instance; otherwise, <see langword="false"/>.</returns>
 	public bool EndsWith(ReadOnlySpan<char> value)
 	{
-		if (value.Length <= this.length)
-		{
-			int requiredIndex = this.length - value.Length;
-			return IndexOf(value, requiredIndex, value.Length) == requiredIndex;
-		}
+		if (value.Length > this.length) return false;
 
-		return false;
+		int requiredIndex = this.length - value.Length;
+		return IndexOf(value, requiredIndex, value.Length) == requiredIndex;
 	}
 
 	/// <summary>
@@ -352,15 +345,12 @@ public sealed partial class MutableString : IEnumerable<char>, IEnumerable, IEqu
 
 			if (index < 0) break;
 
-			
+
 			if (oldValue.Length > newValue.Length)
 			{
 				int diff = oldValue.Length - newValue.Length;
 				Array.Copy(this.buffer, index + diff, this.buffer, index, this.length - index);
 				this.length -= diff;
-
-				newValue.CopyTo(this.buffer.AsSpan()[index..]);
-				index += newValue.Length;
 			}
 			else if (oldValue.Length < newValue.Length)
 			{
@@ -374,15 +364,10 @@ public sealed partial class MutableString : IEnumerable<char>, IEnumerable, IEqu
 					Array.Copy(this.buffer, index + oldValue.Length, this.buffer, index + newValue.Length, this.Length - index - oldValue.Length);
 				}
 				this.length += diff;
+			}
 
-				newValue.CopyTo(this.buffer.AsSpan()[index..]);
-				index += newValue.Length;
-			}
-			else
-			{
-				newValue.CopyTo(this.buffer.AsSpan()[index..]);
-				index += newValue.Length;
-			}
+			newValue.CopyTo(this.buffer.AsSpan()[index..]);
+			index += newValue.Length;
 		}
 
 		return this;
@@ -567,7 +552,6 @@ public sealed partial class MutableString : IEnumerable<char>, IEnumerable, IEqu
 		if (value.Length == 0) return 0; // Empty string can be found anywhere, even in other empty string
 
 		ref char buffer = ref MemoryMarshal.GetArrayDataReference(this.buffer);
-		ref char other = ref MemoryMarshal.GetReference(value);
 		int length = this.length;
 
 		for (int i = 0; i <= length - value.Length; i++)
@@ -638,7 +622,6 @@ public sealed partial class MutableString : IEnumerable<char>, IEnumerable, IEqu
 		if (value.Length == 0) return index;
 
 		ref char buffer = ref MemoryMarshal.GetArrayDataReference(this.buffer);
-		ref char other = ref MemoryMarshal.GetReference(value);
 		int length = this.length;
 
 		for (int i = index; i <= index + count - value.Length; i++)
@@ -800,7 +783,7 @@ public sealed partial class MutableString : IEnumerable<char>, IEnumerable, IEqu
 #endif
 
 		if (ReferenceEquals(this, other)) return true;
-		if (this.length != other!.length) return false;
+		if (this.length != other.length) return false;
 
 		char[] first = other.buffer;
 		char[] second = other.buffer;
@@ -827,7 +810,7 @@ public sealed partial class MutableString : IEnumerable<char>, IEnumerable, IEqu
 #else
 		Guard.IsNotNull(other);
 #endif
-		return this.Equals(other!.AsSpan());
+		return this.Equals(other.AsSpan());
 	}
 
 	/// <summary>
@@ -838,10 +821,11 @@ public sealed partial class MutableString : IEnumerable<char>, IEnumerable, IEqu
 	/// <returns><see langword="true"/> if <paramref name="other"/> content are same; otherwise, <see langword="false"/>.</returns>
 	public bool Equals(ReadOnlySpan<char> other)
 	{
-		if (other!.Length != this.length) return false;
+		if (other.Length != this.length) return false;
 
 		ref char otherReference = ref MemoryMarshal.GetReference(other);
-		ref char thisReference = ref MemoryMarshal.GetArrayDataReference(this.buffer); // Must be ref readonly, but Unsafe.Add allows only refs
+		ref char thisReference = ref MemoryMarshal.GetArrayDataReference(this.buffer); // Must be `ref readonly`, but Unsafe.Add allows only refs
+		// ReSharper disable once LocalVariableHidesMember
 		int length = this.length;
 
 		for (int i = 0; i < length; i++)
