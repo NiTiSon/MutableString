@@ -2,7 +2,6 @@ using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Running;
 using NiTiS;
-using System;
 
 namespace Benchmark;
 

@@ -13,6 +13,7 @@ namespace NiTiS;
 /// Represents a mutable string of characters.
 /// </summary>
 [DebuggerDisplay("{ToString()}")]
+[DebuggerTypeProxy(typeof(MutableStringDebugView))]
 public sealed partial class MutableString : IEnumerable<char>, IEnumerable, IEquatable<MutableString?>, IEquatable<string?>
 {
 	private const int DefaultCapacity = 32;
