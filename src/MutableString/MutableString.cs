@@ -314,7 +314,7 @@ public sealed partial class MutableString : IEnumerable<char>, IEnumerable, IEqu
 	/// Replace all occurrences of a specified Unicode character in the instance to another specified Unicode character.
 	/// </summary>
 	/// <param name="oldChar">The Unicode character to be replaced.</param>
-	/// <param name="newChar">The Unicode character to replace all occurrences of oldChar.</param>
+	/// <param name="newChar">The Unicode character to replace all occurrences of <paramref name="oldChar"/>.</param>
 	/// <returns>A reference to this instance after the replace operation is completed.</returns>
 	public MutableString Replace(char oldChar, char newChar)
 	{
@@ -327,6 +327,60 @@ public sealed partial class MutableString : IEnumerable<char>, IEnumerable, IEqu
 			if (Unsafe.Add(ref buffer, i) == oldChar)
 			{
 				Unsafe.Add(ref buffer, i) = newChar;
+			}
+		}
+
+		return this;
+	}
+
+	/// <summary>
+	/// Replace all occurrences of a specified Unicode character sequence in the instance to another specified Unicode character sequence.
+	/// </summary>
+	/// <param name="oldValue">The string span to be replaced.</param>
+	/// <param name="newValue">The string span to replace all occurrences of <paramref name="oldValue"/>.</param>
+	/// <returns>A reference to this instance after the replace operation is completed.</returns>
+	public MutableString Replace(ReadOnlySpan<char> oldValue, ReadOnlySpan<char> newValue)
+	{
+		if (oldValue.SequenceEqual(newValue)) return this;
+		if (oldValue.IsEmpty) return this;
+
+		int index = 0;
+		while (index < this.length)
+		{
+			index = IndexOf(oldValue, index);
+
+			if (index < 0) break;
+
+			
+			if (oldValue.Length > newValue.Length)
+			{
+				int diff = oldValue.Length - newValue.Length;
+				Array.Copy(this.buffer, index + diff, this.buffer, index, this.length - index);
+				this.length -= diff;
+
+				newValue.CopyTo(this.buffer.AsSpan()[index..]);
+				index += newValue.Length;
+			}
+			else if (oldValue.Length < newValue.Length)
+			{
+				int diff = newValue.Length - oldValue.Length;
+				if (this.buffer.Length < this.length + diff)
+				{
+					GrowForInsertion(index + oldValue.Length, diff); // Extending buffer
+				}
+				else
+				{
+					Array.Copy(this.buffer, index + oldValue.Length, this.buffer, index + newValue.Length, this.Length - index - oldValue.Length);
+				}
+				this.length += diff;
+
+				newValue.CopyTo(this.buffer.AsSpan()[index..]);
+				index += newValue.Length;
+			}
+			else
+			{
+				newValue.CopyTo(this.buffer.AsSpan()[index..]);
+				index += newValue.Length;
 			}
 		}
 

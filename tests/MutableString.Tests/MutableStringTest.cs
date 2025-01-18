@@ -1,5 +1,7 @@
 using NUnit.Framework;
 using System;
+using System.Diagnostics;
+using System.Threading.Tasks;
 
 namespace NiTiS;
 
@@ -78,13 +80,42 @@ internal sealed class MutableStringTest
 	}
 
 	[Test]
-	public void Replaced_Char()
+	public void Replace_Char()
 	{
 		MutableString str = "Hello World";
 
 		str.Replace('o', 'Y');
 
 		Assert.AreEqual("HellY WYrld", str.ToString());
+	}
+
+	[Test]
+	public void Replace_ReadOnlySpan()
+	{
+		MutableString str = "Hello Worllod";
+
+		str.Replace("lo", "wx");
+		Assert.AreEqual("Helwx Worlwxd", str.ToString());
+
+		str.Replace("xd", ":=)");
+		Assert.AreEqual("Helwx Worlw:=)", str.ToString());
+
+		str.Replace("wx", "x");
+		Assert.AreEqual("Helx Worlw:=)", str.ToString());
+
+		MutableString str2 = "xxxxx";
+		Task task = new(() =>
+		{
+			str2.Replace("x", "xx");
+		});
+
+		Assert.DoesNotThrow(() =>
+		{
+			task.Start();
+			if (!task.Wait(300)) throw new Exception("Task takes to much time: LOOP!");
+		});
+
+		Assert.AreEqual(10, str2.Length);
 	}
 
 	[Test]
@@ -246,6 +277,8 @@ internal sealed class MutableStringTest
 		Assert.AreEqual(8, s.IndexOf("is"));
 		Assert.AreEqual(-1, s.IndexOf('Я'));
 
+		Assert.AreEqual(s.Length - 1, s.IndexOf("7"));
+
 		Assert.AreEqual(-1, s.IndexOf("as;dskjalkdjalsjdalskjdlaskjdalsk"));
 	}
 
@@ -266,6 +299,9 @@ internal sealed class MutableStringTest
 		Assert.AreEqual(13, s.IndexOf("s", 12, 2));
 		Assert.AreEqual(13, s.IndexOf("s", 12, 3));
 		Assert.AreEqual(-1, s.IndexOf("s", 12, 1));
+
+		Assert.AreEqual(s.Length - 1, s.IndexOf("7", 10));
+		Assert.AreEqual(s.Length - 2, s.IndexOf("?7", 10));
 
 		Assert.AreEqual(2, s.IndexOf("", 2, 0)); // Empty strings are always found
 
