@@ -595,6 +595,10 @@ public sealed partial class MutableString : IEnumerable<char>, IEnumerable, IEqu
 	[MethodImpl(MethodImplOptions.AggressiveInlining)]
 	public int IndexOf(ReadOnlySpan<char> value, int index)
 	{
+		if (this.length <= index)
+		{
+			ThrowHelper.ThrowArgumentOutOfRangeException(nameof(index), "Index is out of string bounds.");
+		}
 		return IndexOf(value, index, this.length - index);
 	}
 
