@@ -417,4 +417,20 @@ internal sealed class MutableStringTest
 
 		Assert.AreEqual("aellw", str.ToString());
 	}
+
+	[Test]
+	public void TryCopyTo()
+	{
+		MutableString str = "Hello World";
+
+		Span<char> same = stackalloc char[str.Length];
+		Span<char> less = stackalloc char[str.Length - 1];
+		Span<char> more = stackalloc char[str.Length + 1];
+		Span<char> zero = stackalloc char[0];
+
+		Assert.IsTrue(str.TryCopyTo(same));
+		Assert.IsTrue(str.TryCopyTo(more));
+		Assert.IsFalse(str.TryCopyTo(less));
+		Assert.IsFalse(str.TryCopyTo(zero));
+	}
 }

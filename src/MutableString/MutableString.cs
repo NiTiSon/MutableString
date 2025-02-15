@@ -728,6 +728,23 @@ public sealed partial class MutableString : IEquatable<MutableString?>, IEquatab
 		AsSpan().CopyTo(destination);
 	}
 
+	/// <summary>
+	/// Copies the contents of this string into the destination span.
+	/// </summary>
+	/// <param name="destination">The span into which to copy this string's contents.</param>
+	/// <returns><see langword="true"/> if the data was copied; <see langword="false"/> if the destination was too short to fit the contents of the string.</returns>
+	[MethodImpl(MethodImplOptions.AggressiveInlining)]
+	public bool TryCopyTo(Span<char> destination)
+	{
+		if ((uint)Length <= (uint)destination.Length)
+		{
+			buffer.CopyTo(destination);
+			return true;
+		}
+
+		return false;
+	}
+
 	[MethodImpl(MethodImplOptions.AggressiveInlining)]
 	private int GetNewCapacity(int requiredCapacity)
 	{
