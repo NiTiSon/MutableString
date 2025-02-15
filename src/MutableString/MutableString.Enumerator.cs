@@ -3,8 +3,20 @@ using System.Collections.Generic;
 
 namespace NiTiS;
 
-public partial class MutableString
+public partial class MutableString : IEnumerable<char>
 {
+	/// <inheritdoc/>
+	public IEnumerator<char> GetEnumerator()
+	{
+		return new Enumerator(this);
+	}
+
+	/// <inheritdoc/>
+	IEnumerator IEnumerable.GetEnumerator()
+	{
+		return this.GetEnumerator();
+	}
+
 	private sealed class Enumerator : IEnumerator<char>
 	{
 		private MutableString instance;

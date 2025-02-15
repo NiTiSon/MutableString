@@ -16,7 +16,7 @@ namespace NiTiS;
 /// </summary>
 [DebuggerDisplay("{ToString()}")]
 [DebuggerTypeProxy(typeof(MutableStringDebugView))]
-public sealed partial class MutableString : IEnumerable<char>, IEquatable<MutableString?>, IEquatable<string?>
+public sealed partial class MutableString : IEquatable<MutableString?>, IEquatable<string?>
 {
 	private const int DefaultCapacity = 32;
 
@@ -834,18 +834,6 @@ public sealed partial class MutableString : IEnumerable<char>, IEquatable<Mutabl
 		}
 
 		return true;
-	}
-
-	/// <inheritdoc/>
-	public IEnumerator<char> GetEnumerator()
-	{
-		return new Enumerator(this);
-	}
-
-	/// <inheritdoc/>
-	IEnumerator IEnumerable.GetEnumerator()
-	{
-		return this.GetEnumerator();
 	}
 
 	/// <summary>
