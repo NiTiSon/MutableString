@@ -16,7 +16,7 @@
 		<Nullable>enable</Nullable>
 		<RootNamespace>NiTiS</RootNamespace>
 
-		<VersionPrefix>1.0</VersionPrefix>
+		<VersionPrefix>1.1</VersionPrefix>
 
 		<NoWarn>$(NoWarn);IDE0290;IDE0305</NoWarn>
 
@@ -31,7 +31,7 @@
 		<PackageReference Include="DotNet.ReproducibleBuilds" Version="1.1.1" PrivateAssets="All"/>
 		<PackageReference Include="DotNet.ReproducibleBuilds.Isolated" Version="1.1.1" PrivateAssets="All"/>
 	</ItemGroup>
-	
+
 	<PropertyGroup Condition="$([MSBuild]::IsTargetFrameworkCompatible('$(TargetFramework)', 'net7.0'))">
 		<IsAotCompatible>true</IsAotCompatible>
 		<EnableAotAnalyzer>true</EnableAotAnalyzer>
