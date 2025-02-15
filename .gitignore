@@ -4,3 +4,4 @@ obj/
 refs/
 outPackages/
 *.user
+.idea/
