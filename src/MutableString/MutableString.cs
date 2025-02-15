@@ -952,28 +952,4 @@ public sealed partial class MutableString : IEnumerable<char>, IEquatable<Mutabl
 	{
 		return new MutableString(str);
 	}
-
-	public static MutableString operator +(MutableString lhs, ReadOnlySpan<char> rhs)
-	{
-		MutableString str = new(capacity: Math.Max(lhs.Capacity, lhs.length + rhs.Length));
-		str.Append(lhs.AsSpan());
-		str.Append(rhs);
-		return str;
-	}
-
-	public static MutableString operator +(MutableString lhs, char rhs)
-	{
-		MutableString str = new(capacity: Math.Max(lhs.Capacity, lhs.length + 1));
-		str.Append(lhs.AsSpan());
-		str.Append(rhs);
-		return str;
-	}
-
-	public static MutableString operator +(MutableString lhs, MutableString rhs)
-	{
-		MutableString str = new(capacity: Math.Max(lhs.Capacity, lhs.length + rhs.length));
-		str.Append(lhs.AsSpan());
-		str.Append(rhs.AsSpan());
-		return str;
-	}
 }
