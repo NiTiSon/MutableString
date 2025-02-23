@@ -441,34 +441,6 @@ public sealed partial class MutableString : IEquatable<MutableString?>, IEquatab
 	}
 
 	/// <summary>
-	/// Returns a value indicating whether a specified character occurs within this string.
-	/// </summary>
-	/// <param name="value">The char to seek.</param>
-	/// <returns><see langword="true"/> if character contains within string; otherwise, <see langword="false"/>.</returns>
-	public bool Contains(char value)
-	{
-		ref char buffer = ref MemoryMarshal.GetArrayDataReference(this.buffer);
-		int length = this.length;
-
-		for (int i = 0; i < length; i++)
-		{
-			if (Unsafe.Add(ref buffer, i) == value) return true;
-		}
-
-		return false;
-	}
-
-	/// <summary>
-	/// Returns a value indicating whether a specified substring occurs within this string.
-	/// </summary>
-	/// <param name="value">The substring to seek.</param>
-	/// <returns><see langword="true"/> if substring contains within string; otherwise, <see langword="false"/>.</returns>
-	public bool Contains(ReadOnlySpan<char> value)
-	{
-		return IndexOf(value) != -1;
-	}
-
-	/// <summary>
 	/// Reverse character order of this string.
 	/// </summary>
 	/// <returns>A reference to this instance after the reverse operation is completed.</returns>

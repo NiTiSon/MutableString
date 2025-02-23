@@ -2,11 +2,34 @@ using CommunityToolkit.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System;
+using System.Buffers;
+using System.Globalization;
+using System.Diagnostics;
 
 namespace NiTiS;
 
 public partial class MutableString
 {
+#if NET9_0_OR_GREATER
+	internal static class SearchValuesStorage
+	{
+		/// <summary>
+		/// SearchValues would use SpanHelpers.IndexOfAnyValueType for 5 values in this case.
+		/// No need to allocate the SearchValues as a regular Span.IndexOfAny will use the same implementation.
+		/// </summary>
+		public const string NewLineCharsExceptLineFeed = "\r\f\u0085\u2028\u2029";
+
+		/// <summary>
+		/// The Unicode Standard, Sec. 5.8, Recommendation R4 and Table 5-2 state that the CR, LF,
+		/// CRLF, NEL, LS, FF, and PS sequences are considered newline functions. That section
+		/// also specifically excludes VT from the list of newline functions, so we do not include
+		/// it in the needle list.
+		/// </summary>
+		public static readonly SearchValues<char> NewLineChars =
+			SearchValues.Create(NewLineCharsExceptLineFeed + "\n");
+	}
+#endif
+
 	/// <summary>
 	/// Searches for the first occurrence of a specified character within the current string.
 	/// </summary>
@@ -154,6 +177,56 @@ public partial class MutableString
 	}
 
 	/// <summary>
+	/// Searches for the first occurrence of a specified character within the specified section of current string.
+	/// </summary>
+	/// <param name="value">The character to locate within the string.</param>
+	/// <param name="comparisonType"></param>
+	/// <returns>
+	/// The zero-based index of the first occurrence of the specified character if found; otherwise, -1.
+	/// </returns>
+	/// <exception cref="ArgumentException"><paramref name="comparisonType"/> is invalid.</exception>
+	public int IndexOf(char value, StringComparison comparisonType)
+	{
+		switch (comparisonType)
+		{
+			case StringComparison.CurrentCulture:
+			case StringComparison.CurrentCultureIgnoreCase:
+				return CultureInfo.CurrentCulture.CompareInfo.IndexOf(AsSpan(), [value], GetCaseCompareOfComparisonCulture(comparisonType));
+
+			case StringComparison.InvariantCulture:
+			case StringComparison.InvariantCultureIgnoreCase:
+				return CultureInfo.InvariantCulture.CompareInfo.IndexOf(AsSpan(), [value], GetCaseCompareOfComparisonCulture(comparisonType));
+
+			case StringComparison.Ordinal:
+				return IndexOf(value);
+
+			case StringComparison.OrdinalIgnoreCase:
+				if (value.IsAsciiLetter())
+				{
+					char valueUc = (char)(value | 0x20);
+					char valueLc = (char)(value & ~0x20);
+
+					return AsSpan().IndexOfAny(valueUc, valueLc);
+				}
+				else if (char.IsAscii(value))
+				{
+					return AsSpan().IndexOf(value);
+				}
+				else
+				{
+					char valueUc = char.ToUpper(value);
+					char valueLc = char.ToLower(value);
+
+					return AsSpan().IndexOfAny(valueUc, valueLc);
+				}
+
+			default:
+				ThrowHelper.ThrowArgumentException(nameof(comparisonType), "Not supported string comparison value.");
+				return -1;
+		}
+	}
+
+	/// <summary>
 	/// Reports the zero-based index of the first occurrence in this instance of any character in a specified span of Unicode characters.
 	/// </summary>
 	/// <param name="values">A Unicode character span containing one or more characters to seek.</param>
@@ -163,5 +236,53 @@ public partial class MutableString
 	public int IndexOfAny(params ReadOnlySpan<char> values)
 	{
 		return MemoryMarshal.CreateReadOnlySpan(ref MemoryMarshal.GetArrayDataReference(this.buffer), Length).IndexOfAny(values);
+	}
+
+	/// <summary>
+	/// Returns a value indicating whether a specified character occurs within this string.
+	/// </summary>
+	/// <param name="value">The char to seek.</param>
+	/// <returns><see langword="true"/> if character contains within string; otherwise, <see langword="false"/>.</returns>
+	public bool Contains(char value)
+	{
+		ref char buffer = ref MemoryMarshal.GetArrayDataReference(this.buffer);
+		int length = this.length;
+
+		for (int i = 0; i < length; i++)
+		{
+			if (Unsafe.Add(ref buffer, i) == value) return true;
+		}
+
+		return false;
+	}
+
+	/// <summary>
+	/// Returns a value indicating whether a specified substring occurs within this string.
+	/// </summary>
+	/// <param name="value">The substring to seek.</param>
+	/// <returns><see langword="true"/> if substring contains within string; otherwise, <see langword="false"/>.</returns>
+	public bool Contains(ReadOnlySpan<char> value)
+	{
+		return IndexOf(value) != -1;
+	}
+
+	internal static CompareOptions GetCaseCompareOfComparisonCulture(StringComparison comparisonType)
+	{
+		Debug.Assert((uint)comparisonType <= (uint)StringComparison.OrdinalIgnoreCase);
+
+		// Culture enums can be & with CompareOptions.IgnoreCase 0x01 to extract if IgnoreCase or CompareOptions.None 0x00
+		//
+		// CompareOptions.None                          0x00
+		// CompareOptions.IgnoreCase                    0x01
+		//
+		// StringComparison.CurrentCulture:             0x00
+		// StringComparison.InvariantCulture:           0x02
+		// StringComparison.Ordinal                     0x04
+		//
+		// StringComparison.CurrentCultureIgnoreCase:   0x01
+		// StringComparison.InvariantCultureIgnoreCase: 0x03
+		// StringComparison.OrdinalIgnoreCase           0x05
+
+		return (CompareOptions)((int)comparisonType & (int)CompareOptions.IgnoreCase);
 	}
 }
