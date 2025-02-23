@@ -269,6 +269,30 @@ internal sealed class MutableStringTest
 	}
 
 	[Test]
+	public void IndexOf_StringComparsion()
+	{
+		MutableString str = "Дядя Григорий идёт по лесу, поёт песенки";
+
+		Assert.AreEqual(23, str.IndexOf('Е', StringComparison.InvariantCultureIgnoreCase));
+		Assert.AreEqual(-1, str.IndexOf('Е', StringComparison.InvariantCulture));
+
+		Assert.AreEqual(23, str.IndexOf('Е', StringComparison.CurrentCultureIgnoreCase));
+		Assert.AreEqual(-1, str.IndexOf('Е', StringComparison.CurrentCulture));
+
+		Assert.AreEqual(23, str.IndexOf('Е', StringComparison.OrdinalIgnoreCase));
+		Assert.AreEqual(-1, str.IndexOf('Е', StringComparison.Ordinal));
+
+		Assert.AreEqual(16, str.IndexOf("Ёт", StringComparison.InvariantCultureIgnoreCase));
+		Assert.AreEqual(-1, str.IndexOf("Ёт", StringComparison.InvariantCulture));
+
+		Assert.AreEqual(16, str.IndexOf("Ёт", StringComparison.CurrentCultureIgnoreCase));
+		Assert.AreEqual(-1, str.IndexOf("Ёт", StringComparison.CurrentCulture));
+
+		Assert.AreEqual(16, str.IndexOf("Ёт", StringComparison.OrdinalIgnoreCase));
+		Assert.AreEqual(-1, str.IndexOf("Ёт", StringComparison.Ordinal));
+	}
+
+	[Test]
 	public void IndexOf_ReadOnlySpan()
 	{
 		MutableString s = new("Amongus is sus?7");
