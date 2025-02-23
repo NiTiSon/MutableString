@@ -227,6 +227,18 @@ internal sealed class MutableStringTest
 	}
 
 	[Test]
+	public void Contains_Comparison()
+	{
+		MutableString s = new("Amongus is sus?7");
+
+		Assert.IsTrue(s.Contains('S', StringComparison.OrdinalIgnoreCase));
+		Assert.IsTrue(s.Contains("SUS", StringComparison.OrdinalIgnoreCase));
+
+		Assert.IsFalse(s.Contains('S', StringComparison.Ordinal));
+		Assert.IsFalse(s.Contains("SUS", StringComparison.Ordinal));
+	}
+
+	[Test]
 	public void IndexOf_Char()
 	{
 		MutableString s = new("Amongus is sus?7");
