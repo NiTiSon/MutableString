@@ -5,6 +5,7 @@ MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "build", "build", "{1A7118EA-D78E-4724-91D4-4EFE9054D97E}"
 	ProjectSection(SolutionItems) = preProject
 		build\common.props = build\common.props
+		README.md = README.md
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MutableString", "src\MutableString\MutableString.csproj", "{1FAA1F51-0A7A-44CF-88FE-AFE85FCD26BA}"
