@@ -92,18 +92,7 @@ public partial class MutableString
 	{
 		if (value.Length == 0) return 0; // Empty string can be found anywhere, even in other empty string
 
-		ref char buffer = ref MemoryMarshal.GetArrayDataReference(this.buffer);
-		int length = this.length;
-
-		for (int i = 0; i <= length - value.Length; i++)
-		{
-			if (MemoryMarshal.CreateSpan(ref buffer, length).Slice(i, value.Length).SequenceEqual(value))
-			{
-				return i;
-			}
-		}
-
-		return -1;
+		return AsSpan().IndexOf(value);
 	}
 
 	/// <summary>
@@ -125,6 +114,7 @@ public partial class MutableString
 		{
 			ThrowHelper.ThrowArgumentOutOfRangeException(nameof(index), "Index is out of string bounds.");
 		}
+
 		return IndexOf(value, index, this.length - index);
 	}
 
@@ -162,25 +152,14 @@ public partial class MutableString
 
 		if (value.Length == 0) return index;
 
-		ref char buffer = ref MemoryMarshal.GetArrayDataReference(this.buffer);
-		int length = this.length;
-
-		for (int i = index; i <= index + count - value.Length; i++)
-		{
-			if (MemoryMarshal.CreateSpan(ref buffer, length).Slice(i, value.Length).SequenceEqual(value))
-			{
-				return i;
-			}
-		}
-
-		return -1;
+		return AsSpan().Slice(index, count).IndexOf(value);
 	}
 
 	/// <summary>
 	/// Searches for the first occurrence of a specified character within the specified section of current string.
 	/// </summary>
 	/// <param name="value">The character to locate within the string.</param>
-	/// <param name="comparisonType"></param>
+	/// <param name="comparisonType">One of the enumeration values that specifies the rules to use in the comparison.</param>
 	/// <returns>
 	/// The zero-based index of the first occurrence of the specified character if found; otherwise, -1.
 	/// </returns>
@@ -238,6 +217,8 @@ public partial class MutableString
 		return MemoryMarshal.CreateReadOnlySpan(ref MemoryMarshal.GetArrayDataReference(this.buffer), Length).IndexOfAny(values);
 	}
 
+	// TODO: More IndexOfAny
+
 	/// <summary>
 	/// Returns a value indicating whether a specified character occurs within this string.
 	/// </summary>
@@ -245,15 +226,19 @@ public partial class MutableString
 	/// <returns><see langword="true"/> if character contains within string; otherwise, <see langword="false"/>.</returns>
 	public bool Contains(char value)
 	{
-		ref char buffer = ref MemoryMarshal.GetArrayDataReference(this.buffer);
-		int length = this.length;
+		return IndexOf(value) >= 0;
+	}
 
-		for (int i = 0; i < length; i++)
-		{
-			if (Unsafe.Add(ref buffer, i) == value) return true;
-		}
 
-		return false;
+	/// <summary>
+	/// Returns a value indicating whether a specified character occurs within this string, using the specified comparison rules.
+	/// </summary>
+	/// <param name="value">The char to seek.</param>
+	///	<param name="comparisonType">One of the enumeration values that specifies the rules to use in the comparison.</param>
+	/// <returns><see langword="true"/> if character contains within string; otherwise, <see langword="false"/>.</returns>
+	public bool Contains(char value, StringComparison comparisonType)
+	{
+		return IndexOf(value, comparisonType) >= 0;
 	}
 
 	/// <summary>
@@ -263,7 +248,18 @@ public partial class MutableString
 	/// <returns><see langword="true"/> if substring contains within string; otherwise, <see langword="false"/>.</returns>
 	public bool Contains(ReadOnlySpan<char> value)
 	{
-		return IndexOf(value) != -1;
+		return IndexOf(value) >= 0;
+	}
+
+	/// <summary>
+	/// Returns a value indicating whether a specified string occurs within this string, using the specified comparison rules.
+	/// </summary>
+	/// <param name="value">The substring to seek.</param>
+	///	<param name="comparisonType">One of the enumeration values that specifies the rules to use in the comparison.</param>
+	/// <returns><see langword="true"/> if substring contains within string; otherwise, <see langword="false"/>.</returns>
+	public bool Contains(ReadOnlySpan<char> value, StringComparison comparisonType)
+	{
+		return IndexOf(value, comparisonType) >= 0;
 	}
 
 	internal static CompareOptions GetCaseCompareOfComparisonCulture(StringComparison comparisonType)
