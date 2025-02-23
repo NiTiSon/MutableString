@@ -15,7 +15,7 @@ namespace NiTiS;
 /// </summary>
 [DebuggerDisplay("{ToString()}")]
 [DebuggerTypeProxy(typeof(MutableStringDebugView))]
-public sealed partial class MutableString : IEquatable<MutableString?>, IEquatable<string?>
+public sealed partial class MutableString : IEquatable<MutableString?>, IEquatable<string?>, ICloneable
 {
 	private const int DefaultCapacity = 32;
 
@@ -195,6 +195,12 @@ public sealed partial class MutableString : IEquatable<MutableString?>, IEquatab
 	public MutableString Duplicate()
 	{
 		return new MutableString(this.buffer, 0, this.length);
+	}
+
+	/// <inheritdoc/>
+	object ICloneable.Clone()
+	{
+		return Duplicate();
 	}
 
 	/// <summary>
