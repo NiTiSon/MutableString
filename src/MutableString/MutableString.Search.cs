@@ -152,7 +152,8 @@ public partial class MutableString
 
 		if (value.Length == 0) return index;
 
-		return AsSpan().Slice(index, count).IndexOf(value);
+		int result = AsSpan().Slice(index, count).IndexOf(value);
+		return result >= 0 ? result + index : -1;
 	}
 
 	/// <summary>
@@ -205,6 +206,16 @@ public partial class MutableString
 		}
 	}
 
+	/// <summary>
+	/// Searches for the first occurrence of a specified substring within the current string.
+	/// </summary>
+	/// <param name="value">The substring to locate within the string.</param>
+	/// <param name="comparisonType">One of the enumeration values that specifies the rules to use in the comparison.</param>
+	/// <returns>
+	/// The zero-based index of the first occurrence of the specified substring if found; otherwise, -1.
+	/// If <paramref name="value"/> is an empty span, 0 is returned.
+	/// </returns>
+	/// <exception cref="ArgumentException"><paramref name="comparisonType"/> is invalid.</exception>
 	public int IndexOf(ReadOnlySpan<char> value, StringComparison comparisonType)
 	{
 		switch (comparisonType)
@@ -221,7 +232,7 @@ public partial class MutableString
 				return IndexOf(value);
 
 			case StringComparison.OrdinalIgnoreCase:
-				
+				return ((ReadOnlySpan<char>)AsSpan()).IndexOfOrdinalIgnoreCase(value);
 
 			default:
 				ThrowHelper.ThrowArgumentException(nameof(comparisonType), "Not supported string comparison value.");
