@@ -205,6 +205,30 @@ public partial class MutableString
 		}
 	}
 
+	public int IndexOf(ReadOnlySpan<char> value, StringComparison comparisonType)
+	{
+		switch (comparisonType)
+		{
+			case StringComparison.CurrentCulture:
+			case StringComparison.CurrentCultureIgnoreCase:
+				return CultureInfo.CurrentCulture.CompareInfo.IndexOf(AsSpan(), value, GetCaseCompareOfComparisonCulture(comparisonType));
+
+			case StringComparison.InvariantCulture:
+			case StringComparison.InvariantCultureIgnoreCase:
+				return CultureInfo.InvariantCulture.CompareInfo.IndexOf(AsSpan(), value, GetCaseCompareOfComparisonCulture(comparisonType));
+
+			case StringComparison.Ordinal:
+				return IndexOf(value);
+
+			case StringComparison.OrdinalIgnoreCase:
+				
+
+			default:
+				ThrowHelper.ThrowArgumentException(nameof(comparisonType), "Not supported string comparison value.");
+				return -1;
+		}
+	}
+
 	/// <summary>
 	/// Reports the zero-based index of the first occurrence in this instance of any character in a specified span of Unicode characters.
 	/// </summary>
@@ -262,10 +286,55 @@ public partial class MutableString
 		return IndexOf(value, comparisonType) >= 0;
 	}
 
+
+	/// <summary>
+	/// Determines whether this string instance starts with the specified character.
+	/// </summary>
+	/// <param name="value">The character to compare.</param>
+	/// <returns><see langword="true"/> if <paramref name="value"/> matches the beginning of this string; otherwise, <see langword="false"/>.</returns>
+	public bool StartsWith(char value)
+	{
+		return this.buffer.Length > 0 && this.buffer[0] == value;
+	}
+
+	/// <summary>
+	/// Determines whether the beginning of this string instance matches the specified span.
+	/// </summary>
+	/// <param name="value">The span to compare.</param>
+	/// <returns><see langword="true"/> if <paramref name="value"/> matches the beginning of this string; otherwise, <see langword="false"/>.</returns>
+	public bool StartsWith(ReadOnlySpan<char> value)
+	{
+		if (value.Length > this.length) return false;
+
+		return IndexOf(value, 0, value.Length) == 0;
+	}
+
+	/// <summary>
+	/// Determines whether the end of this string instance matches the specified character.
+	/// </summary>
+	/// <param name="value">The character to compare to the character at the end of this instance.</param>
+	/// <returns><see langword="true"/> if <paramref name="value"/> matches the end of this instance; otherwise, <see langword="false"/>.</returns>
+	public bool EndsWith(char value)
+	{
+		return this.buffer.Length > 0 && this.buffer[^1] == value;
+	}
+
+
+	/// <summary>
+	/// Determines whether the end of this string instance matches the specified span.
+	/// </summary>
+	/// <param name="value">The span to compare to the substring at the end of this instance.</param>
+	/// <returns><see langword="true"/> if <paramref name="value"/> matches the end of this instance; otherwise, <see langword="false"/>.</returns>
+	public bool EndsWith(ReadOnlySpan<char> value)
+	{
+		if (value.Length > this.length) return false;
+
+		int requiredIndex = this.length - value.Length;
+		return IndexOf(value, requiredIndex, value.Length) == requiredIndex;
+	}
+
 	internal static CompareOptions GetCaseCompareOfComparisonCulture(StringComparison comparisonType)
 	{
-		Debug.Assert((uint)comparisonType <= (uint)StringComparison.OrdinalIgnoreCase);
-
 		// Culture enums can be & with CompareOptions.IgnoreCase 0x01 to extract if IgnoreCase or CompareOptions.None 0x00
 		//
 		// CompareOptions.None                          0x00
