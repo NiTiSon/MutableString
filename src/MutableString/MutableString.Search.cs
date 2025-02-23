@@ -167,43 +167,12 @@ public partial class MutableString
 	/// <exception cref="ArgumentException"><paramref name="comparisonType"/> is invalid.</exception>
 	public int IndexOf(char value, StringComparison comparisonType)
 	{
-		switch (comparisonType)
+		if (comparisonType > StringComparison.OrdinalIgnoreCase)
 		{
-			case StringComparison.CurrentCulture:
-			case StringComparison.CurrentCultureIgnoreCase:
-				return CultureInfo.CurrentCulture.CompareInfo.IndexOf(AsSpan(), [value], GetCaseCompareOfComparisonCulture(comparisonType));
-
-			case StringComparison.InvariantCulture:
-			case StringComparison.InvariantCultureIgnoreCase:
-				return CultureInfo.InvariantCulture.CompareInfo.IndexOf(AsSpan(), [value], GetCaseCompareOfComparisonCulture(comparisonType));
-
-			case StringComparison.Ordinal:
-				return IndexOf(value);
-
-			case StringComparison.OrdinalIgnoreCase:
-				if (value.IsAsciiLetter())
-				{
-					char valueUc = (char)(value | 0x20);
-					char valueLc = (char)(value & ~0x20);
-
-					return AsSpan().IndexOfAny(valueUc, valueLc);
-				}
-				else if (char.IsAscii(value))
-				{
-					return AsSpan().IndexOf(value);
-				}
-				else
-				{
-					char valueUc = char.ToUpper(value);
-					char valueLc = char.ToLower(value);
-
-					return AsSpan().IndexOfAny(valueUc, valueLc);
-				}
-
-			default:
-				ThrowHelper.ThrowArgumentException(nameof(comparisonType), "Not supported string comparison value.");
-				return -1;
+			ThrowHelper.ThrowArgumentException(nameof(comparisonType), "Not supported string comparison value.");
 		}
+
+		return MemoryExtensions.IndexOf(AsSpan(), [value], comparisonType);
 	}
 
 	/// <summary>
@@ -218,26 +187,12 @@ public partial class MutableString
 	/// <exception cref="ArgumentException"><paramref name="comparisonType"/> is invalid.</exception>
 	public int IndexOf(ReadOnlySpan<char> value, StringComparison comparisonType)
 	{
-		switch (comparisonType)
+		if (comparisonType > StringComparison.OrdinalIgnoreCase)
 		{
-			case StringComparison.CurrentCulture:
-			case StringComparison.CurrentCultureIgnoreCase:
-				return CultureInfo.CurrentCulture.CompareInfo.IndexOf(AsSpan(), value, GetCaseCompareOfComparisonCulture(comparisonType));
-
-			case StringComparison.InvariantCulture:
-			case StringComparison.InvariantCultureIgnoreCase:
-				return CultureInfo.InvariantCulture.CompareInfo.IndexOf(AsSpan(), value, GetCaseCompareOfComparisonCulture(comparisonType));
-
-			case StringComparison.Ordinal:
-				return IndexOf(value);
-
-			case StringComparison.OrdinalIgnoreCase:
-				return ((ReadOnlySpan<char>)AsSpan()).IndexOfOrdinalIgnoreCase(value);
-
-			default:
-				ThrowHelper.ThrowArgumentException(nameof(comparisonType), "Not supported string comparison value.");
-				return -1;
+			ThrowHelper.ThrowArgumentException(nameof(comparisonType), "Not supported string comparison value.");
 		}
+
+		return MemoryExtensions.IndexOf(AsSpan(), value, comparisonType);
 	}
 
 	/// <summary>
@@ -251,8 +206,6 @@ public partial class MutableString
 	{
 		return MemoryMarshal.CreateReadOnlySpan(ref MemoryMarshal.GetArrayDataReference(this.buffer), Length).IndexOfAny(values);
 	}
-
-	// TODO: More IndexOfAny
 
 	/// <summary>
 	/// Returns a value indicating whether a specified character occurs within this string.
@@ -344,6 +297,7 @@ public partial class MutableString
 		return IndexOf(value, requiredIndex, value.Length) == requiredIndex;
 	}
 
+	[Obsolete("For deletion probably")]
 	internal static CompareOptions GetCaseCompareOfComparisonCulture(StringComparison comparisonType)
 	{
 		// Culture enums can be & with CompareOptions.IgnoreCase 0x01 to extract if IgnoreCase or CompareOptions.None 0x00
