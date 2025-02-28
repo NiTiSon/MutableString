@@ -296,23 +296,4 @@ public partial class MutableString
 		int requiredIndex = this.length - value.Length;
 		return IndexOf(value, requiredIndex, value.Length) == requiredIndex;
 	}
-
-	[Obsolete("For deletion probably")]
-	internal static CompareOptions GetCaseCompareOfComparisonCulture(StringComparison comparisonType)
-	{
-		// Culture enums can be & with CompareOptions.IgnoreCase 0x01 to extract if IgnoreCase or CompareOptions.None 0x00
-		//
-		// CompareOptions.None                          0x00
-		// CompareOptions.IgnoreCase                    0x01
-		//
-		// StringComparison.CurrentCulture:             0x00
-		// StringComparison.InvariantCulture:           0x02
-		// StringComparison.Ordinal                     0x04
-		//
-		// StringComparison.CurrentCultureIgnoreCase:   0x01
-		// StringComparison.InvariantCultureIgnoreCase: 0x03
-		// StringComparison.OrdinalIgnoreCase           0x05
-
-		return (CompareOptions)((int)comparisonType & (int)CompareOptions.IgnoreCase);
-	}
 }
