@@ -1,6 +1,5 @@
 using CommunityToolkit.Diagnostics;
 using System;
-using System.Buffers;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
@@ -8,6 +7,38 @@ namespace NiTiS;
 
 public partial class MutableString
 {
+	/// <summary>
+	/// Fill whole string content with <paramref name="filler"/>.
+	/// </summary>
+	/// <param name="filler">Character to fill whole string.</param>
+	/// <returns>A reference to this instance after the fill operation is completed.</returns>
+	public MutableString Fill(char filler)
+	{
+		AsSpan().Fill(filler);
+		return this;
+	}
+
+	/// <summary>
+	/// Fill specified string region by specified filler.
+	/// </summary>
+	/// <param name="range">Range to fill.</param>
+	/// <param name="filler">Character to fill within the range.</param>
+	/// <returns>A reference to this instance after the fill operation is completed.</returns>
+	/// <exception cref="ArgumentOutOfRangeException"><paramref name="range"/> present invalid span of string.</exception>
+	public MutableString Fill(Range range, char filler)
+	{
+		int start = range.Start.GetOffset(this.length);
+		int length = range.End.GetOffset(this.length) - start;
+
+		if (length < 0)
+		{
+			ThrowHelper.ThrowArgumentOutOfRangeException(nameof(range));
+		}
+
+		AsSpan().Slice(start, length).Fill(filler);
+		return this;
+	}
+
 	/// <summary>
 	/// Appends the string representation of a specified <see cref="char"/> object to this <see cref="MutableString"/> instance.
 	/// </summary>
