@@ -80,6 +80,34 @@ internal sealed class MutableStringTest
 	}
 
 	[Test]
+	public void Fill()
+	{
+		MutableString s = new(7)
+		{
+			Length = 7
+		};
+
+		s.Fill('Ы');
+		Assert.AreEqual("ЫЫЫЫЫЫЫ", s);
+
+		s.Fill(Range.All, '.');
+		Assert.AreEqual(".......", s);
+
+		s.Fill(2..3, '!');
+		Assert.AreEqual("..!....", s);
+
+		Assert.Throws<ArgumentOutOfRangeException>(() =>
+		{
+			s.Fill(0..(s.Length+1), 'S');
+		});
+
+		Assert.Throws<ArgumentOutOfRangeException>(() =>
+		{
+			s.Fill(-1..s.Length, 'S');
+		});
+	}
+
+	[Test]
 	public void Replace_Char()
 	{
 		MutableString str = "Hello World";

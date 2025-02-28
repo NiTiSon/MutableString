@@ -30,7 +30,7 @@ public partial class MutableString
 		int start = range.Start.GetOffset(this.length);
 		int length = range.End.GetOffset(this.length) - start;
 
-		if (length < 0)
+		if (length < 0 || length > this.length || start < 0)
 		{
 			ThrowHelper.ThrowArgumentOutOfRangeException(nameof(range));
 		}
