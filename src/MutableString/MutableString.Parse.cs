@@ -12,7 +12,7 @@ public partial class MutableString : IParsable<MutableString>, ISpanParsable<Mut
 	/// <inheritdoc/>
 	public static MutableString Parse(string s, IFormatProvider? provider)
 	{
-		throw new NotImplementedException();
+		return new(s);
 	}
 
 	/// <inheritdoc/>
@@ -39,13 +39,23 @@ public partial class MutableString : IParsable<MutableString>, ISpanParsable<Mut
 	/// <inheritdoc/>
 	public static bool TryParse([NotNullWhen(true)] string? s, IFormatProvider? provider, [MaybeNullWhen(false)] out MutableString result)
 	{
-		throw new NotImplementedException();
+		if (s is null)
+		{
+			result = null;
+			return false;
+		}
+		else
+		{
+			result = new(s);
+			return true;
+		}
 	}
 
 	/// <inheritdoc/>
 	public static bool TryParse(ReadOnlySpan<char> s, IFormatProvider? provider, [MaybeNullWhen(false)] out MutableString result)
 	{
-		throw new NotImplementedException();
+		result = new(s);
+		return true;
 	}
 
 	/// <inheritdoc/>
