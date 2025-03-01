@@ -297,7 +297,17 @@ internal sealed class MutableStringTest
 
 		Assert.Throws<ArgumentOutOfRangeException>(() =>
 		{
+			s.IndexOf('x', 12812);
+		});
+
+		Assert.Throws<ArgumentOutOfRangeException>(() =>
+		{
 			s.IndexOf('x', -1, 0);
+		});
+
+		Assert.Throws<ArgumentOutOfRangeException>(() =>
+		{
+			s.IndexOf('x', 12812, 0);
 		});
 
 		Assert.Throws<ArgumentOutOfRangeException>(() =>
