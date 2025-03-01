@@ -218,6 +218,20 @@ public sealed partial class MutableString : IEquatable<MutableString?>, IEquatab
 	}
 
 	/// <summary>
+	/// Creates a new readonly span over current string.
+	/// </summary>
+	/// <remarks>
+	/// The string length shall not be modified during span lifetime!
+	/// </remarks>
+	/// <returns>Span instance pointing on internal buffer.</returns>
+	[MethodImpl(MethodImplOptions.AggressiveInlining)]
+	public ReadOnlySpan<char> AsReadOnlySpan()
+	{
+		ref char buffer = ref MemoryMarshal.GetArrayDataReference(this.buffer);
+		return MemoryMarshal.CreateReadOnlySpan(ref buffer, this.length);
+	}
+
+	/// <summary>
 	/// Copies the current string to the specified destination array.
 	/// </summary>
 	/// <param name="destination">The array to which the string will be copied.</param>

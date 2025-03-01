@@ -1,10 +1,7 @@
 using CommunityToolkit.Diagnostics;
-using System.Runtime.CompilerServices;
-using System.Runtime.InteropServices;
 using System;
 using System.Buffers;
-using System.Globalization;
-using System.Diagnostics;
+using System.Runtime.CompilerServices;
 
 namespace NiTiS;
 
@@ -30,6 +27,7 @@ public partial class MutableString
 	}
 #endif
 
+	#region IndexOf layer
 	/// <summary>
 	/// Searches for the first occurrence of a specified character within the current string.
 	/// </summary>
@@ -110,7 +108,7 @@ public partial class MutableString
 	[MethodImpl(MethodImplOptions.AggressiveInlining)]
 	public int IndexOf(ReadOnlySpan<char> value, int index)
 	{
-		if (this.length <= index)
+		if ((uint)this.length <= (uint)index)
 		{
 			ThrowHelper.ThrowArgumentOutOfRangeException(nameof(index), "Index is out of string bounds.");
 		}
@@ -176,6 +174,74 @@ public partial class MutableString
 	}
 
 	/// <summary>
+	/// Searches for the first occurrence of a specified character within the current string from specified <paramref name="index"/>.
+	/// </summary>
+	/// <param name="value">The character to locate within the string.</param>
+	/// <param name="index">The zero-based starting index of the search.</param>
+	/// <param name="comparisonType">One of the enumeration values that specifies the rules to use in the comparison.</param>
+	/// <returns>
+	/// The zero-based index of the first occurrence of the specified character if found; otherwise, -1.
+	/// </returns>
+	/// <exception cref="ArgumentOutOfRangeException">
+	/// <paramref name="index"/> is outside the range of valid indexes for the string.
+	/// </exception>
+	/// <exception cref="ArgumentException"><paramref name="comparisonType"/> is invalid.</exception>
+	public int IndexOf(char value, int index, StringComparison comparisonType)
+	{
+		if (index < 0 || index >= this.length)
+		{
+			ThrowHelper.ThrowArgumentOutOfRangeException(nameof(index), "Index is outside the range of valid indexes for the string.");
+		}
+		if (comparisonType > StringComparison.OrdinalIgnoreCase)
+		{
+			ThrowHelper.ThrowArgumentException(nameof(comparisonType), "Not supported string comparison value.");
+		}
+
+		return MemoryExtensions.IndexOf(AsReadOnlySpan()[index..], [value], comparisonType);
+	}
+
+	/// <summary>
+	/// Searches for the first occurrence of a specified substring within the specified section of current string.
+	/// </summary>
+	/// <param name="value">The substring to locate within the string.</param>
+	/// <param name="index">The zero-based starting index of the search.</param>
+	/// <param name="count">The number of elements in the string to search.</param>
+	/// <param name="comparisonType">One of the enumeration values that specifies the rules to use in the comparison.</param>
+	/// <returns>
+	/// The zero-based index of the first occurrence of the specified substring if found; otherwise, -1.
+	/// If <paramref name="value"/> is an empty span, 0 is returned.
+	/// </returns>
+	/// <exception cref="ArgumentOutOfRangeException">
+	/// <paramref name="index"/> is outside the range of valid indexes for the string.
+	/// -or-
+	/// <paramref name="count"/> is less than 0.
+	/// -or-
+	/// <paramref name="index"/> and <paramref name="count"/> do not specify a valid section in the string.
+	/// </exception>
+	/// <exception cref="ArgumentException"><paramref name="comparisonType"/> is invalid.</exception>
+	public int IndexOf(char value, int index, int count, StringComparison comparisonType)
+	{
+		if (index < 0)
+		{
+			ThrowHelper.ThrowArgumentOutOfRangeException(nameof(index), "Index is outside the range of valid indexes for the string.");
+		}
+		if (count < 0)
+		{
+			ThrowHelper.ThrowArgumentOutOfRangeException(nameof(count), "Count must be greater or equal 0 (zero).");
+		}
+		if (index + count > this.length)
+		{
+			ThrowHelper.ThrowArgumentOutOfRangeException(nameof(count), "Index and count do not specify a valid section in the string.");
+		}
+		if (comparisonType > StringComparison.OrdinalIgnoreCase)
+		{
+			ThrowHelper.ThrowArgumentException(nameof(comparisonType), "Not supported string comparison value.");
+		}
+
+		return MemoryExtensions.IndexOf(AsReadOnlySpan().Slice(index, count), [value], comparisonType);
+	}
+
+	/// <summary>
 	/// Searches for the first occurrence of a specified substring within the current string.
 	/// </summary>
 	/// <param name="value">The substring to locate within the string.</param>
@@ -196,15 +262,140 @@ public partial class MutableString
 	}
 
 	/// <summary>
+	/// Searches for the first occurrence of a specified character within the current string from specified <paramref name="index"/>.
+	/// </summary>
+	/// <param name="value">The character to locate within the string.</param>
+	/// <param name="index">The zero-based starting index of the search.</param>
+	/// <param name="comparisonType">One of the enumeration values that specifies the rules to use in the comparison.</param>
+	/// <returns>
+	/// The zero-based index of the first occurrence of the specified character if found; otherwise, -1.
+	/// </returns>
+	/// <exception cref="ArgumentOutOfRangeException">
+	/// <paramref name="index"/> is outside the range of valid indexes for the string.
+	/// </exception>
+	/// <exception cref="ArgumentException"><paramref name="comparisonType"/> is invalid.</exception>
+	public int IndexOf(ReadOnlySpan<char> value, int index, StringComparison comparisonType)
+	{
+		if (index < 0 || index >= this.length)
+		{
+			ThrowHelper.ThrowArgumentOutOfRangeException(nameof(index), "Index is outside the range of valid indexes for the string.");
+		}
+		if (comparisonType > StringComparison.OrdinalIgnoreCase)
+		{
+			ThrowHelper.ThrowArgumentException(nameof(comparisonType), "Not supported string comparison value.");
+		}
+
+		return MemoryExtensions.IndexOf(AsReadOnlySpan()[index..], value, comparisonType);
+	}
+
+	/// <summary>
+	/// Searches for the first occurrence of a specified character within the specified section of current string.
+	/// </summary>
+	/// <param name="value">The character to locate within the string.</param>
+	/// <param name="index">The zero-based starting index of the search.</param>
+	/// <param name="count">The number of elements in the string to search.</param>
+	/// <param name="comparisonType">One of the enumeration values that specifies the rules to use in the comparison.</param>
+	/// <returns>
+	/// The zero-based index of the first occurrence of the specified character if found; otherwise, -1.
+	/// </returns>
+	/// <exception cref="ArgumentOutOfRangeException">
+	/// <paramref name="index"/> is outside the range of valid indexes for the string.
+	/// -or-
+	/// <paramref name="count"/> is less than 0.
+	/// -or-
+	/// <paramref name="index"/> and <paramref name="count"/> do not specify a valid section in the string.
+	/// </exception>
+	/// <exception cref="ArgumentException"><paramref name="comparisonType"/> is invalid.</exception>
+	public int IndexOf(ReadOnlySpan<char> value, int index, int count, StringComparison comparisonType)
+	{
+		if (index < 0)
+		{
+			ThrowHelper.ThrowArgumentOutOfRangeException(nameof(index), "Index is outside the range of valid indexes for the string.");
+		}
+		if (count < 0)
+		{
+			ThrowHelper.ThrowArgumentOutOfRangeException(nameof(count), "Count must be greater or equal 0 (zero).");
+		}
+		if (index + count > this.length)
+		{
+			ThrowHelper.ThrowArgumentOutOfRangeException(nameof(count), "Index and count do not specify a valid section in the string.");
+		}
+		if (comparisonType > StringComparison.OrdinalIgnoreCase)
+		{
+			ThrowHelper.ThrowArgumentException(nameof(comparisonType), "Not supported string comparison value.");
+		}
+
+		return MemoryExtensions.IndexOf(AsReadOnlySpan().Slice(index, count), value, comparisonType);
+	}
+	#endregion
+
+	/// <summary>
 	/// Reports the zero-based index of the first occurrence in this instance of any character in a specified span of Unicode characters.
 	/// </summary>
 	/// <param name="values">A Unicode character span containing one or more characters to seek.</param>
 	/// <returns>
-	/// The zero-based index position of the first occurrence in this instance where any character in anyOf was found; -1 if no character in anyOf was found.
+	/// The zero-based index position of the first occurrence in this instance where any character in <paramref name="values"/> was found; -1 if no character in <paramref name="values"/> was found.
 	/// </returns>
 	public int IndexOfAny(params ReadOnlySpan<char> values)
 	{
-		return MemoryMarshal.CreateReadOnlySpan(ref MemoryMarshal.GetArrayDataReference(this.buffer), Length).IndexOfAny(values);
+		return AsReadOnlySpan().IndexOfAny(values);
+	}
+
+	/// <summary>
+	/// Reports the zero-based index of the first occurrence in this instance of any character in a specified span of Unicode characters.
+	/// The search starts at a specified character position.
+	/// </summary>
+	/// <param name="values">A Unicode character span containing one or more characters to seek.</param>
+	/// <param name="index">The search starting position.</param>
+	/// <returns>
+	/// The zero-based index position of the first occurrence in this instance where any character in <paramref name="values"/> was found; -1 if no character in <paramref name="values"/> was found.
+	/// </returns>
+	/// <exception cref="ArgumentOutOfRangeException">
+	/// <paramref name="index"/> is outside the range of valid indexes for the string.
+	/// </exception>
+	public int IndexOfAny(ReadOnlySpan<char> values, int index)
+	{
+		if ((uint)this.length <= (uint)index)
+		{
+			ThrowHelper.ThrowArgumentOutOfRangeException(nameof(index), "Index is out of string bounds.");
+		}
+
+		return AsReadOnlySpan()[index..].IndexOfAny(values);
+	}
+
+	/// <summary>
+	/// Reports the zero-based index of the first occurrence in this instance of any character in a specified span of Unicode characters.
+	/// The search starts at a specified character position.
+	/// </summary>
+	/// <param name="values">A Unicode character span containing one or more characters to seek.</param>
+	/// <param name="index">The search starting position.</param>
+	/// <param name="count">The number of character positions to examine.</param>
+	/// <returns>
+	/// The zero-based index position of the first occurrence in this instance where any character in <paramref name="values"/> was found; -1 if no character in <paramref name="values"/> was found.
+	/// </returns>
+	/// <exception cref="ArgumentOutOfRangeException">
+	/// <paramref name="index"/> is outside the range of valid indexes for the string.
+	/// -or-
+	/// <paramref name="count"/> is less than 0.
+	/// -or-
+	/// <paramref name="index"/> and <paramref name="count"/> do not specify a valid section in the string.
+	/// </exception>
+	public int IndexOfAny(ReadOnlySpan<char> values, int index, int count)
+	{
+		if (index < 0)
+		{
+			ThrowHelper.ThrowArgumentOutOfRangeException(nameof(index), "Index is outside the range of valid indexes for the string.");
+		}
+		if (count < 0)
+		{
+			ThrowHelper.ThrowArgumentOutOfRangeException(nameof(count), "Count must be greater or equal 0 (zero).");
+		}
+		if (index + count > this.length)
+		{
+			ThrowHelper.ThrowArgumentOutOfRangeException(nameof(count), "Index and count do not specify a valid section in the string.");
+		}
+
+		return AsReadOnlySpan().Slice(index, count).IndexOfAny(values);
 	}
 
 	/// <summary>
@@ -216,7 +407,6 @@ public partial class MutableString
 	{
 		return IndexOf(value) >= 0;
 	}
-
 
 	/// <summary>
 	/// Returns a value indicating whether a specified character occurs within this string, using the specified comparison rules.
