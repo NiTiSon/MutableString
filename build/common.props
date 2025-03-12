@@ -1,6 +1,7 @@
 <Project InitialTargets="MutableString_SetIcon;MutableString_AddREADME">
 	<PropertyGroup>
 		<PackageLicenseExpression>MIT</PackageLicenseExpression>
+        <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
 		<Authors>NiTiSon and contributors</Authors>
 		<PackageTags>$(PackageTags);string;mutable;fast</PackageTags>
 		<Description>Mutable string implementation</Description>
